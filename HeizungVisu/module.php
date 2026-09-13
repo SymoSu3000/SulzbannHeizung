@@ -4,9 +4,151 @@ declare(strict_types=1);
 
 class SulzbannHeizungVisualisierung extends IPSModule
 {
+    /*
+     * ============================================================
+     * FBH-KREISE
+     * ============================================================
+     *
+     * Physikalisch geprüft:
+     *
+     * Ventilstatus:
+     *   false / 0 = geschlossen
+     *   true  / 1 = offen
+     *
+     * Stellwert:
+     *   0...100 %
+     *
+     * Der Stellwert ist der MDT-Reglerausgang / PWM-Bedarf.
+     * Er ist NICHT gleichbedeutend mit der momentanen
+     * mechanischen Ventilstellung.
+     * ============================================================
+     */
+
+    private const FBH_CIRCUITS = [
+
+        /*
+         * ========================================================
+         * ERDGESCHOSS
+         * ========================================================
+         */
+
+        'EG' => [
+
+            [
+                'name'   => 'Haupteingang',
+                'state'  => 18344,
+                'demand' => 39391
+            ],
+
+            [
+                'name'   => 'Küche',
+                'state'  => 50892,
+                'demand' => 22281
+            ],
+
+            [
+                'name'   => 'WC',
+                'state'  => 37309,
+                'demand' => 49588
+            ],
+
+            [
+                'name'   => 'Wohnen / Essen',
+                'state'  => 57721,
+                'demand' => 51260
+            ]
+
+        ],
+
+
+        /*
+         * ========================================================
+         * OBERGESCHOSS
+         * ========================================================
+         */
+
+        'OG' => [
+
+            [
+                'name'   => 'Bad',
+                'state'  => 52749,
+                'demand' => 26389
+            ],
+
+            [
+                'name'   => 'Büro',
+                'state'  => 46861,
+                'demand' => 43578
+            ],
+
+            [
+                'name'   => 'Dusche',
+                'state'  => 49967,
+                'demand' => 36459
+            ],
+
+            [
+                'name'   => 'Eltern',
+                'state'  => 15602,
+                'demand' => 26819
+            ],
+
+            [
+                'name'   => 'Jan',
+                'state'  => 27850,
+                'demand' => 39276
+            ],
+
+            [
+                'name'   => 'Lea',
+                'state'  => 10375,
+                'demand' => 16937
+            ]
+
+        ],
+
+
+        /*
+         * ========================================================
+         * EINLIEGERWOHNUNG
+         * ========================================================
+         */
+
+        'ELW' => [
+
+            [
+                'name'   => 'Bad',
+                'state'  => 33924,
+                'demand' => 19263
+            ],
+
+            [
+                'name'   => 'Küche Essen',
+                'state'  => 19131,
+                'demand' => 17140
+            ],
+
+            [
+                'name'   => 'Wohnen',
+                'state'  => 58629,
+                'demand' => 14321
+            ],
+
+            [
+                'name'   => 'Zimmer',
+                'state'  => 12822,
+                'demand' => 20806
+            ]
+
+        ]
+
+    ];
+
+
     public function Create(): void
     {
         parent::Create();
+
 
         /*
          * ============================================================
@@ -163,7 +305,7 @@ class SulzbannHeizungVisualisierung extends IPSModule
 
         /*
          * ============================================================
-         * KOMPAKT-VISU
+         * KOMPAKTVISU
          * ============================================================
          */
 
@@ -215,6 +357,7 @@ class SulzbannHeizungVisualisierung extends IPSModule
             10
         );
 
+
         $this->RegisterTimer(
             'RenderTimer',
             0,
@@ -227,15 +370,20 @@ class SulzbannHeizungVisualisierung extends IPSModule
     {
         parent::ApplyChanges();
 
+
         foreach (
             $this->GetObservedVariableIDs()
             as $variableID
         ) {
+
             if (
                 $variableID > 0
                 &&
-                IPS_VariableExists($variableID)
+                IPS_VariableExists(
+                    $variableID
+                )
             ) {
+
                 $this->RegisterMessage(
                     $variableID,
                     VM_UPDATE
@@ -243,10 +391,12 @@ class SulzbannHeizungVisualisierung extends IPSModule
             }
         }
 
+
         $this->SetTimerInterval(
             'RenderTimer',
             0
         );
+
 
         $this->Update();
     }
@@ -259,25 +409,31 @@ class SulzbannHeizungVisualisierung extends IPSModule
             0
         );
 
+
         $html =
             $this->BuildVisualization();
+
 
         $variableID =
             $this->GetIDForIdent(
                 'HTML'
             );
 
+
         $current =
             GetValueString(
                 $variableID
             );
 
+
         if ($current !== $html) {
+
             SetValueString(
                 $variableID,
                 $html
             );
         }
+
 
         $this->SetStatus(
             102
@@ -291,6 +447,7 @@ class SulzbannHeizungVisualisierung extends IPSModule
         $Message,
         $Data
     ): void {
+
         parent::MessageSink(
             $TimeStamp,
             $SenderID,
@@ -298,9 +455,12 @@ class SulzbannHeizungVisualisierung extends IPSModule
             $Data
         );
 
+
         if ($Message !== VM_UPDATE) {
+
             return;
         }
+
 
         $delay =
             max(
@@ -310,6 +470,7 @@ class SulzbannHeizungVisualisierung extends IPSModule
                 )
             );
 
+
         $this->SetTimerInterval(
             'RenderTimer',
             $delay
@@ -317,26 +478,42 @@ class SulzbannHeizungVisualisierung extends IPSModule
     }
 
 
+    /*
+     * ============================================================
+     * ID MIT FALLBACK
+     * ============================================================
+     */
+
     private function PropertyID(
         string $name,
         int $fallback = 0
     ): int {
+
         $id =
             $this->ReadPropertyInteger(
                 $name
             );
 
+
         if ($id <= 0) {
+
             return $fallback;
         }
+
 
         return $id;
     }
 
 
+    /*
+     * ============================================================
+     * BEOBACHTETE VARIABLEN
+     * ============================================================
+     */
+
     private function GetObservedVariableIDs(): array
     {
-        return [
+        $ids = [
 
             $this->PropertyID(
                 'OutsideTempID',
@@ -479,13 +656,51 @@ class SulzbannHeizungVisualisierung extends IPSModule
             )
 
         ];
+
+
+        /*
+         * Alle FBH Status- und Stellwertvariablen mitbeobachten.
+         */
+
+        foreach (
+            self::FBH_CIRCUITS
+            as $circuits
+        ) {
+
+            foreach (
+                $circuits
+                as $circuit
+            ) {
+
+                $ids[] =
+                    (int) $circuit['state'];
+
+                $ids[] =
+                    (int) $circuit['demand'];
+            }
+        }
+
+
+        return
+            array_values(
+                array_unique(
+                    $ids
+                )
+            );
     }
 
+
+    /*
+     * ============================================================
+     * WERTE LESEN
+     * ============================================================
+     */
 
     private function ReadValueSafe(
         int $variableID,
         mixed $default = null
     ): mixed {
+
         if (
             $variableID <= 0
             ||
@@ -493,14 +708,20 @@ class SulzbannHeizungVisualisierung extends IPSModule
                 $variableID
             )
         ) {
+
             return $default;
         }
 
+
         try {
-            return GetValue(
-                $variableID
-            );
+
+            return
+                GetValue(
+                    $variableID
+                );
+
         } catch (Throwable $e) {
+
             return $default;
         }
     }
@@ -509,75 +730,303 @@ class SulzbannHeizungVisualisierung extends IPSModule
     private function ReadFloat(
         int $variableID
     ): ?float {
+
         $value =
             $this->ReadValueSafe(
                 $variableID,
                 null
             );
 
+
         if (
             $value === null
             ||
-            !is_numeric($value)
+            !is_numeric(
+                $value
+            )
         ) {
+
             return null;
         }
 
-        return (float) $value;
+
+        return
+            (float) $value;
     }
 
 
     private function ReadInteger(
         int $variableID
     ): ?int {
+
         $value =
             $this->ReadValueSafe(
                 $variableID,
                 null
             );
 
+
         if (
             $value === null
             ||
-            !is_numeric($value)
+            !is_numeric(
+                $value
+            )
         ) {
+
             return null;
         }
 
-        return (int) $value;
+
+        return
+            (int) round(
+                (float) $value
+            );
     }
 
 
     private function ReadBool(
         int $variableID
     ): bool {
+
         $value =
             $this->ReadValueSafe(
                 $variableID,
                 false
             );
 
+
         if (is_bool($value)) {
+
             return $value;
         }
 
+
         if (is_numeric($value)) {
+
             return
                 ((float) $value)
                 !==
                 0.0;
         }
 
+
         return false;
     }
 
 
+    /*
+     * ============================================================
+     * FBH AUSWERTEN
+     * ============================================================
+     */
+
+    private function EvaluateCircuits(
+        array $circuits
+    ): array {
+
+        $total =
+            0;
+
+        $open =
+            0;
+
+        $demandSum =
+            0.0;
+
+        $demandCount =
+            0;
+
+
+        foreach (
+            $circuits
+            as $circuit
+        ) {
+
+            $stateID =
+                (int) $circuit['state'];
+
+            $demandID =
+                (int) $circuit['demand'];
+
+
+            if (
+                $stateID > 0
+                &&
+                IPS_VariableExists(
+                    $stateID
+                )
+            ) {
+
+                $total++;
+
+
+                /*
+                 * Physikalisch geprüft:
+                 *
+                 * true / 1 = offen
+                 */
+                if (
+                    $this->ReadBool(
+                        $stateID
+                    )
+                ) {
+
+                    $open++;
+                }
+            }
+
+
+            $demand =
+                $this->ReadFloat(
+                    $demandID
+                );
+
+
+            if ($demand !== null) {
+
+                /*
+                 * KNX Scaling bei unseren MDT-Werten:
+                 * bereits als 0...100 angezeigt / geliefert.
+                 */
+
+                $demand =
+                    max(
+                        0.0,
+                        min(
+                            100.0,
+                            $demand
+                        )
+                    );
+
+
+                $demandSum +=
+                    $demand;
+
+                $demandCount++;
+            }
+        }
+
+
+        $averageDemand =
+            $demandCount > 0
+                ?
+                $demandSum
+                /
+                $demandCount
+                :
+                0.0;
+
+
+        return [
+
+            'open' =>
+                $open,
+
+            'total' =>
+                $total,
+
+            'demand' =>
+                $averageDemand,
+
+            'demandSum' =>
+                $demandSum,
+
+            'demandCount' =>
+                $demandCount
+
+        ];
+    }
+
+
+    private function EvaluateAllCircuits(): array
+    {
+        $result = [];
+
+        $totalOpen =
+            0;
+
+        $totalCircuits =
+            0;
+
+        $totalDemandSum =
+            0.0;
+
+        $totalDemandCount =
+            0;
+
+
+        foreach (
+            self::FBH_CIRCUITS
+            as $group =>
+            $circuits
+        ) {
+
+            $evaluation =
+                $this->EvaluateCircuits(
+                    $circuits
+                );
+
+
+            $result[
+                $group
+            ] =
+                $evaluation;
+
+
+            $totalOpen +=
+                $evaluation['open'];
+
+            $totalCircuits +=
+                $evaluation['total'];
+
+            $totalDemandSum +=
+                $evaluation['demandSum'];
+
+            $totalDemandCount +=
+                $evaluation['demandCount'];
+        }
+
+
+        $result['TOTAL'] = [
+
+            'open' =>
+                $totalOpen,
+
+            'total' =>
+                $totalCircuits,
+
+            'demand' =>
+                $totalDemandCount > 0
+                    ?
+                    $totalDemandSum
+                    /
+                    $totalDemandCount
+                    :
+                    0.0
+
+        ];
+
+
+        return $result;
+    }
+
+
+    /*
+     * ============================================================
+     * FORMATIERUNG
+     * ============================================================
+     */
+
     private function FormatTemperature(
         ?float $value
     ): string {
+
         if ($value === null) {
+
             return '—';
         }
+
 
         return
             number_format(
@@ -594,9 +1043,12 @@ class SulzbannHeizungVisualisierung extends IPSModule
     private function FormatPower(
         ?float $value
     ): string {
+
         if ($value === null) {
+
             return '—';
         }
+
 
         return
             number_format(
@@ -613,9 +1065,12 @@ class SulzbannHeizungVisualisierung extends IPSModule
     private function FormatFlow(
         ?float $value
     ): string {
+
         if ($value === null) {
+
             return '—';
         }
+
 
         return
             number_format(
@@ -630,14 +1085,22 @@ class SulzbannHeizungVisualisierung extends IPSModule
 
 
     private function FormatPercent(
-        ?int $value
+        ?float $value
     ): string {
+
         if ($value === null) {
+
             return '—';
         }
 
+
         return
-            $value
+            number_format(
+                $value,
+                0,
+                '.',
+                ''
+            )
             .
             ' %';
     }
@@ -646,9 +1109,12 @@ class SulzbannHeizungVisualisierung extends IPSModule
     private function FormatCOP(
         ?float $value
     ): string {
+
         if ($value === null) {
+
             return '—';
         }
+
 
         return
             number_format(
@@ -660,17 +1126,40 @@ class SulzbannHeizungVisualisierung extends IPSModule
     }
 
 
+    private function FormatValveCount(
+        array $evaluation
+    ): string {
+
+        return
+            $evaluation['open']
+            .
+            ' / '
+            .
+            $evaluation['total']
+            .
+            ' offen';
+    }
+
+
     private function H(
         string $value
     ): string {
-        return htmlspecialchars(
-            $value,
-            ENT_QUOTES |
-            ENT_SUBSTITUTE,
-            'UTF-8'
-        );
+
+        return
+            htmlspecialchars(
+                $value,
+                ENT_QUOTES |
+                ENT_SUBSTITUTE,
+                'UTF-8'
+            );
     }
 
+
+    /*
+     * ============================================================
+     * TEMPLATE
+     * ============================================================
+     */
 
     private function LoadTemplate(): string
     {
@@ -679,50 +1168,77 @@ class SulzbannHeizungVisualisierung extends IPSModule
             .
             '/module.html';
 
+
         if (!is_file($file)) {
+
             return
-                '<div style="padding:20px;color:red;">module.html fehlt</div>';
+                '<div style="padding:20px;color:red;">'
+                .
+                'module.html fehlt'
+                .
+                '</div>';
         }
+
 
         $html =
             file_get_contents(
                 $file
             );
 
+
         if ($html === false) {
+
             return
-                '<div style="padding:20px;color:red;">module.html konnte nicht geladen werden</div>';
+                '<div style="padding:20px;color:red;">'
+                .
+                'module.html konnte nicht geladen werden'
+                .
+                '</div>';
         }
+
 
         return $html;
     }
 
+
+    /*
+     * ============================================================
+     * WP BETRIEB
+     * ============================================================
+     */
 
     private function DetermineWPMode(
         bool $heating,
         bool $cooling,
         bool $dhw
     ): array {
+
         if ($dhw) {
+
             return [
                 'text'  => 'Warmwasser',
                 'color' => '#d69b00'
             ];
         }
 
+
         if ($cooling) {
+
             return [
                 'text'  => 'Kühlen',
                 'color' => '#1685d1'
             ];
         }
 
+
         if ($heating) {
+
             return [
                 'text'  => 'Heizen',
                 'color' => '#e13946'
             ];
         }
+
 
         return [
             'text'  => 'Standby',
@@ -731,6 +1247,12 @@ class SulzbannHeizungVisualisierung extends IPSModule
     }
 
 
+    /*
+     * ============================================================
+     * BUILD
+     * ============================================================
+     */
+
     private function BuildVisualization(): string
     {
         $template =
@@ -738,9 +1260,9 @@ class SulzbannHeizungVisualisierung extends IPSModule
 
 
         /*
-         * ============================================================
+         * ========================================================
          * TEMPERATUREN
-         * ============================================================
+         * ========================================================
          */
 
         $outside =
@@ -753,6 +1275,7 @@ class SulzbannHeizungVisualisierung extends IPSModule
                 )
             );
 
+
         $wpFlow =
             $this->FormatTemperature(
                 $this->ReadFloat(
@@ -762,6 +1285,7 @@ class SulzbannHeizungVisualisierung extends IPSModule
                     )
                 )
             );
+
 
         $wpReturn =
             $this->FormatTemperature(
@@ -773,6 +1297,7 @@ class SulzbannHeizungVisualisierung extends IPSModule
                 )
             );
 
+
         $boilerTop =
             $this->FormatTemperature(
                 $this->ReadFloat(
@@ -782,6 +1307,7 @@ class SulzbannHeizungVisualisierung extends IPSModule
                     )
                 )
             );
+
 
         $boilerBottom =
             $this->FormatTemperature(
@@ -793,6 +1319,7 @@ class SulzbannHeizungVisualisierung extends IPSModule
                 )
             );
 
+
         $bufferTop =
             $this->FormatTemperature(
                 $this->ReadFloat(
@@ -802,6 +1329,7 @@ class SulzbannHeizungVisualisierung extends IPSModule
                     )
                 )
             );
+
 
         $bufferMiddle =
             $this->FormatTemperature(
@@ -813,6 +1341,7 @@ class SulzbannHeizungVisualisierung extends IPSModule
                 )
             );
 
+
         $bufferBottom =
             $this->FormatTemperature(
                 $this->ReadFloat(
@@ -822,6 +1351,7 @@ class SulzbannHeizungVisualisierung extends IPSModule
                     )
                 )
             );
+
 
         $fbhFlow =
             $this->FormatTemperature(
@@ -835,9 +1365,9 @@ class SulzbannHeizungVisualisierung extends IPSModule
 
 
         /*
-         * ============================================================
-         * KOMPAKT STATUS
-         * ============================================================
+         * ========================================================
+         * KOMPAKTSTATUS
+         * ========================================================
          */
 
         $wpActive =
@@ -848,6 +1378,7 @@ class SulzbannHeizungVisualisierung extends IPSModule
                 )
             );
 
+
         $wpStateCompact =
             $wpActive
                 ?
@@ -855,12 +1386,14 @@ class SulzbannHeizungVisualisierung extends IPSModule
                 :
                 'Aus';
 
+
         $wpStateGraphic =
             $wpActive
                 ?
                 'Verdichter Ein'
                 :
                 'Verdichter Aus';
+
 
         $wpActiveClass =
             $wpActive
@@ -871,9 +1404,9 @@ class SulzbannHeizungVisualisierung extends IPSModule
 
 
         /*
-         * ============================================================
-         * WP MODUS DIREKT OZW
-         * ============================================================
+         * ========================================================
+         * DIREKTER WP-BETRIEB AUS OZW
+         * ========================================================
          */
 
         $heating =
@@ -884,6 +1417,7 @@ class SulzbannHeizungVisualisierung extends IPSModule
                 )
             );
 
+
         $cooling =
             $this->ReadBool(
                 $this->PropertyID(
@@ -892,6 +1426,7 @@ class SulzbannHeizungVisualisierung extends IPSModule
                 )
             );
 
+
         $dhw =
             $this->ReadBool(
                 $this->PropertyID(
@@ -899,6 +1434,7 @@ class SulzbannHeizungVisualisierung extends IPSModule
                     21617
                 )
             );
+
 
         $wpMode =
             $this->DetermineWPMode(
@@ -909,9 +1445,9 @@ class SulzbannHeizungVisualisierung extends IPSModule
 
 
         /*
-         * ============================================================
+         * ========================================================
          * Q2
-         * ============================================================
+         * ========================================================
          */
 
         $q2Active =
@@ -922,12 +1458,14 @@ class SulzbannHeizungVisualisierung extends IPSModule
                 )
             );
 
+
         $q2Text =
             $q2Active
                 ?
                 'Ein'
                 :
                 'Aus';
+
 
         $q2Color =
             $q2Active
@@ -938,9 +1476,9 @@ class SulzbannHeizungVisualisierung extends IPSModule
 
 
         /*
-         * ============================================================
+         * ========================================================
          * VERDICHTER
-         * ============================================================
+         * ========================================================
          */
 
         $compressor1 =
@@ -951,6 +1489,7 @@ class SulzbannHeizungVisualisierung extends IPSModule
                 )
             );
 
+
         $compressor2 =
             $this->ReadBool(
                 $this->PropertyID(
@@ -959,10 +1498,12 @@ class SulzbannHeizungVisualisierung extends IPSModule
                 )
             );
 
+
         $compressorActive =
             $compressor1
             ||
             $compressor2;
+
 
         $compressorText =
             $compressorActive
@@ -970,6 +1511,7 @@ class SulzbannHeizungVisualisierung extends IPSModule
                 'Ein'
                 :
                 'Aus';
+
 
         $compressorColor =
             $compressorActive
@@ -980,20 +1522,21 @@ class SulzbannHeizungVisualisierung extends IPSModule
 
 
         /*
-         * ============================================================
-         * DIAGNOSE
-         * ============================================================
+         * ========================================================
+         * WP-DIAGNOSE
+         * ========================================================
          */
 
         $modulation =
             $this->FormatPercent(
-                $this->ReadInteger(
+                $this->ReadFloat(
                     $this->PropertyID(
                         'WPModulationID',
                         20837
                     )
                 )
             );
+
 
         $flowRate =
             $this->FormatFlow(
@@ -1005,6 +1548,7 @@ class SulzbannHeizungVisualisierung extends IPSModule
                 )
             );
 
+
         $electricalPower =
             $this->FormatPower(
                 $this->ReadFloat(
@@ -1015,6 +1559,7 @@ class SulzbannHeizungVisualisierung extends IPSModule
                 )
             );
 
+
         $heatOutput =
             $this->FormatPower(
                 $this->ReadFloat(
@@ -1024,6 +1569,7 @@ class SulzbannHeizungVisualisierung extends IPSModule
                     )
                 )
             );
+
 
         $cop =
             $this->FormatCOP(
@@ -1037,9 +1583,9 @@ class SulzbannHeizungVisualisierung extends IPSModule
 
 
         /*
-         * ============================================================
-         * PUMPEN
-         * ============================================================
+         * ========================================================
+         * INTERNE WP-PUMPEN
+         * ========================================================
          */
 
         $condenserPump =
@@ -1050,6 +1596,7 @@ class SulzbannHeizungVisualisierung extends IPSModule
                 )
             );
 
+
         $condenserPumpText =
             $condenserPump
                 ?
@@ -1057,15 +1604,17 @@ class SulzbannHeizungVisualisierung extends IPSModule
                 :
                 'Aus';
 
+
         $condenserPumpSpeed =
             $this->FormatPercent(
-                $this->ReadInteger(
+                $this->ReadFloat(
                     $this->PropertyID(
                         'CondenserPumpSpeedID',
                         32715
                     )
                 )
             );
+
 
         $sourcePump =
             $this->ReadBool(
@@ -1075,6 +1624,7 @@ class SulzbannHeizungVisualisierung extends IPSModule
                 )
             );
 
+
         $sourcePumpText =
             $sourcePump
                 ?
@@ -1082,15 +1632,17 @@ class SulzbannHeizungVisualisierung extends IPSModule
                 :
                 'Aus';
 
+
         $sourcePumpSpeed =
             $this->FormatPercent(
-                $this->ReadInteger(
+                $this->ReadFloat(
                     $this->PropertyID(
                         'SourcePumpSpeedID',
                         17723
                     )
                 )
             );
+
 
         $sourceFlow =
             $this->FormatFlow(
@@ -1104,9 +1656,9 @@ class SulzbannHeizungVisualisierung extends IPSModule
 
 
         /*
-         * ============================================================
+         * ========================================================
          * HEIZSTÄBE
-         * ============================================================
+         * ========================================================
          */
 
         $boilerHeater =
@@ -1117,6 +1669,7 @@ class SulzbannHeizungVisualisierung extends IPSModule
                 )
             );
 
+
         $bufferHeater =
             $this->ReadBool(
                 $this->PropertyID(
@@ -1125,12 +1678,14 @@ class SulzbannHeizungVisualisierung extends IPSModule
                 )
             );
 
+
         $boilerHeaterClass =
             $boilerHeater
                 ?
                 'active'
                 :
                 '';
+
 
         $bufferHeaterClass =
             $bufferHeater
@@ -1139,12 +1694,14 @@ class SulzbannHeizungVisualisierung extends IPSModule
                 :
                 '';
 
+
         $boilerHeaterText =
             $boilerHeater
                 ?
                 'Ein'
                 :
                 'Aus';
+
 
         $bufferHeaterText =
             $bufferHeater
@@ -1155,72 +1712,125 @@ class SulzbannHeizungVisualisierung extends IPSModule
 
 
         /*
-         * ============================================================
+         * ========================================================
          * FBH-VENTILE
-         *
-         * IDs noch nicht abschliessend zugeordnet.
-         * ============================================================
+         * ========================================================
          */
 
+        $fbh =
+            $this->EvaluateAllCircuits();
+
+
         $egValves =
-            '— / — offen';
+            $this->FormatValveCount(
+                $fbh['EG']
+            );
+
 
         $ogValves =
-            '— / — offen';
+            $this->FormatValveCount(
+                $fbh['OG']
+            );
+
+
+        $elwValves =
+            $this->FormatValveCount(
+                $fbh['ELW']
+            );
+
 
         $totalValves =
-            '— / — offen';
+            $this->FormatValveCount(
+                $fbh['TOTAL']
+            );
+
 
         $egDemand =
-            '—';
+            $this->FormatPercent(
+                $fbh['EG']['demand']
+            );
+
 
         $ogDemand =
-            '—';
+            $this->FormatPercent(
+                $fbh['OG']['demand']
+            );
+
+
+        $elwDemand =
+            $this->FormatPercent(
+                $fbh['ELW']['demand']
+            );
+
 
         $totalDemand =
-            '—';
+            $this->FormatPercent(
+                $fbh['TOTAL']['demand']
+            );
 
 
         /*
-         * ============================================================
+         * ========================================================
          * PLACEHOLDER
-         * ============================================================
+         * ========================================================
          */
 
         $replace = [
 
             '{{OUTSIDE}}' =>
-                $this->H($outside),
+                $this->H(
+                    $outside
+                ),
 
             '{{WP_FLOW}}' =>
-                $this->H($wpFlow),
+                $this->H(
+                    $wpFlow
+                ),
 
             '{{WP_RETURN}}' =>
-                $this->H($wpReturn),
+                $this->H(
+                    $wpReturn
+                ),
 
             '{{BOILER_TOP}}' =>
-                $this->H($boilerTop),
+                $this->H(
+                    $boilerTop
+                ),
 
             '{{BOILER_BOTTOM}}' =>
-                $this->H($boilerBottom),
+                $this->H(
+                    $boilerBottom
+                ),
 
             '{{BUFFER_TOP}}' =>
-                $this->H($bufferTop),
+                $this->H(
+                    $bufferTop
+                ),
 
             '{{BUFFER_MIDDLE}}' =>
-                $this->H($bufferMiddle),
+                $this->H(
+                    $bufferMiddle
+                ),
 
             '{{BUFFER_BOTTOM}}' =>
-                $this->H($bufferBottom),
+                $this->H(
+                    $bufferBottom
+                ),
 
             '{{FBH_FLOW}}' =>
-                $this->H($fbhFlow),
+                $this->H(
+                    $fbhFlow
+                ),
 
             '{{WP_STATE_COMPACT}}' =>
-                $this->H($wpStateCompact),
+                $this->H(
+                    $wpStateCompact
+                ),
 
             '{{WP_STATE_GRAPHIC}}' =>
-                $this->H($wpStateGraphic),
+                $this->H(
+                    $wpStateGraphic
+                ),
 
             '{{WP_ACTIVE_CLASS}}' =>
                 $wpActiveClass,
@@ -1234,46 +1844,70 @@ class SulzbannHeizungVisualisierung extends IPSModule
                 $wpMode['color'],
 
             '{{Q2_STATE}}' =>
-                $this->H($q2Text),
+                $this->H(
+                    $q2Text
+                ),
 
             '{{Q2_COLOR}}' =>
                 $q2Color,
 
             '{{COMPRESSOR_STATE}}' =>
-                $this->H($compressorText),
+                $this->H(
+                    $compressorText
+                ),
 
             '{{COMPRESSOR_COLOR}}' =>
                 $compressorColor,
 
             '{{WP_MODULATION}}' =>
-                $this->H($modulation),
+                $this->H(
+                    $modulation
+                ),
 
             '{{WP_FLOW_RATE}}' =>
-                $this->H($flowRate),
+                $this->H(
+                    $flowRate
+                ),
 
             '{{WP_ELECTRICAL_POWER}}' =>
-                $this->H($electricalPower),
+                $this->H(
+                    $electricalPower
+                ),
 
             '{{WP_HEAT_OUTPUT}}' =>
-                $this->H($heatOutput),
+                $this->H(
+                    $heatOutput
+                ),
 
             '{{WP_COP}}' =>
-                $this->H($cop),
+                $this->H(
+                    $cop
+                ),
 
             '{{CONDENSER_PUMP}}' =>
-                $this->H($condenserPumpText),
+                $this->H(
+                    $condenserPumpText
+                ),
 
             '{{CONDENSER_PUMP_SPEED}}' =>
-                $this->H($condenserPumpSpeed),
+                $this->H(
+                    $condenserPumpSpeed
+                ),
 
             '{{SOURCE_PUMP}}' =>
-                $this->H($sourcePumpText),
+                $this->H(
+                    $sourcePumpText
+                ),
 
             '{{SOURCE_PUMP_SPEED}}' =>
-                $this->H($sourcePumpSpeed),
+                $this->H(
+                    $sourcePumpSpeed
+                ),
 
             '{{SOURCE_FLOW}}' =>
-                $this->H($sourceFlow),
+                $this->H(
+                    $sourceFlow
+                ),
 
             '{{BOILER_HEATER_CLASS}}' =>
                 $boilerHeaterClass,
@@ -1282,28 +1916,54 @@ class SulzbannHeizungVisualisierung extends IPSModule
                 $bufferHeaterClass,
 
             '{{BOILER_HEATER_STATE}}' =>
-                $this->H($boilerHeaterText),
+                $this->H(
+                    $boilerHeaterText
+                ),
 
             '{{BUFFER_HEATER_STATE}}' =>
-                $this->H($bufferHeaterText),
+                $this->H(
+                    $bufferHeaterText
+                ),
 
             '{{EG_VALVES}}' =>
-                $this->H($egValves),
+                $this->H(
+                    $egValves
+                ),
 
             '{{OG_VALVES}}' =>
-                $this->H($ogValves),
+                $this->H(
+                    $ogValves
+                ),
+
+            '{{ELW_VALVES}}' =>
+                $this->H(
+                    $elwValves
+                ),
 
             '{{TOTAL_VALVES}}' =>
-                $this->H($totalValves),
+                $this->H(
+                    $totalValves
+                ),
 
             '{{EG_DEMAND}}' =>
-                $this->H($egDemand),
+                $this->H(
+                    $egDemand
+                ),
 
             '{{OG_DEMAND}}' =>
-                $this->H($ogDemand),
+                $this->H(
+                    $ogDemand
+                ),
+
+            '{{ELW_DEMAND}}' =>
+                $this->H(
+                    $elwDemand
+                ),
 
             '{{TOTAL_DEMAND}}' =>
-                $this->H($totalDemand)
+                $this->H(
+                    $totalDemand
+                )
 
         ];
 
