@@ -1,0 +1,105 @@
+{
+    "elements": [
+        {
+            "type": "Label",
+            "caption": "Sulzbann Heizung Visualisierung"
+        },
+        {
+            "type": "Label",
+            "caption": "Eine HTMLBox: kompakte Kachel und Hydraulik-Grossansicht."
+        },
+        {
+            "type": "NumberSpinner",
+            "name": "OutsideTempID",
+            "caption": "Aussentemperatur",
+            "minimum": 0
+        },
+        {
+            "type": "NumberSpinner",
+            "name": "WPFlowID",
+            "caption": "WP Vorlauf",
+            "minimum": 0
+        },
+        {
+            "type": "NumberSpinner",
+            "name": "WPReturnID",
+            "caption": "WP Rücklauf",
+            "minimum": 0
+        },
+        {
+            "type": "NumberSpinner",
+            "name": "BoilerTopID",
+            "caption": "Boiler B3 oben",
+            "minimum": 0
+        },
+        {
+            "type": "NumberSpinner",
+            "name": "BoilerBottomID",
+            "caption": "Boiler B31 unten",
+            "minimum": 0
+        },
+        {
+            "type": "NumberSpinner",
+            "name": "BufferTopID",
+            "caption": "Puffer B4 oben",
+            "minimum": 0
+        },
+        {
+            "type": "NumberSpinner",
+            "name": "BufferMiddleID",
+            "caption": "Puffer B4.1 Mitte",
+            "minimum": 0
+        },
+        {
+            "type": "NumberSpinner",
+            "name": "BufferBottomID",
+            "caption": "Puffer B41 unten",
+            "minimum": 0
+        },
+        {
+            "type": "NumberSpinner",
+            "name": "FBHFlowID",
+            "caption": "FBH B1",
+            "minimum": 0
+        },
+        {
+            "type": "NumberSpinner",
+            "name": "WPStatusID",
+            "caption": "WP / Verdichter Status",
+            "minimum": 0
+        },
+        {
+            "type": "NumberSpinner",
+            "name": "BoilerHeaterID",
+            "caption": "Boiler Heizstab",
+            "minimum": 0
+        },
+        {
+            "type": "NumberSpinner",
+            "name": "BufferHeaterID",
+            "caption": "Puffer Heizstab",
+            "minimum": 0
+        },
+        {
+            "type": "NumberSpinner",
+            "name": "RenderDelay",
+            "caption": "Update-Sammelzeit in ms",
+            "minimum": 250,
+            "maximum": 5000
+        }
+    ],
+    "actions": [
+        {
+            "type": "Button",
+            "caption": "Visualisierung aktualisieren",
+            "onClick": "SBHV_Update($id);"
+        }
+    ],
+    "status": [
+        {
+            "code": 102,
+            "icon": "active",
+            "caption": "Aktiv"
+        }
+    ]
+}
