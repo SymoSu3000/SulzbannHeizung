@@ -1,0 +1,13 @@
+{
+    "id": "{6128F514-4949-46C5-B674-05125FF25202}",
+    "name": "Sulzbann Heizung Visualisierung",
+    "type": 3,
+    "vendor": "Sulzbann",
+    "aliases": [
+        "Sulzbann Heizung Visu"
+    ],
+    "parentRequirements": [],
+    "childRequirements": [],
+    "implemented": [],
+    "prefix": "SBHV"
+}
