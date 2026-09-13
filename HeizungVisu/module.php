@@ -4,92 +4,149 @@ declare(strict_types=1);
 
 class SulzbannHeizungVisualisierung extends IPSModule
 {
-    /*
-     * ============================================================
-     * CREATE
-     * ============================================================
-     */
-
     public function Create(): void
     {
         parent::Create();
 
-
         /*
-         * ========================================================
-         * DATENPUNKTE
-         * ========================================================
+         * ============================================================
+         * BESTEHENDE VISU-WERTE
+         * ============================================================
          */
 
-        $this->RegisterPropertyInteger(
-            'OutsideTempID',
-            50237
-        );
+        $this->RegisterPropertyInteger('OutsideTempID', 50237);
 
-        $this->RegisterPropertyInteger(
-            'WPFlowID',
-            27923
-        );
+        $this->RegisterPropertyInteger('WPFlowID', 27923);
+        $this->RegisterPropertyInteger('WPReturnID', 45419);
 
-        $this->RegisterPropertyInteger(
-            'WPReturnID',
-            45419
-        );
+        $this->RegisterPropertyInteger('BoilerTopID', 39112);
+        $this->RegisterPropertyInteger('BoilerBottomID', 40096);
 
-        $this->RegisterPropertyInteger(
-            'BoilerTopID',
-            39112
-        );
+        $this->RegisterPropertyInteger('BufferTopID', 27553);
+        $this->RegisterPropertyInteger('BufferMiddleID', 52270);
+        $this->RegisterPropertyInteger('BufferBottomID', 18594);
 
-        $this->RegisterPropertyInteger(
-            'BoilerBottomID',
-            40096
-        );
+        $this->RegisterPropertyInteger('WPStatusID', 16864);
 
-        $this->RegisterPropertyInteger(
-            'BufferTopID',
-            27553
-        );
+        $this->RegisterPropertyInteger('BoilerHeaterID', 10737);
+        $this->RegisterPropertyInteger('BufferHeaterID', 53546);
 
-        $this->RegisterPropertyInteger(
-            'BufferMiddleID',
-            52270
-        );
-
-        $this->RegisterPropertyInteger(
-            'BufferBottomID',
-            18594
-        );
 
         /*
-         * B1 noch nicht eindeutig zugeordnet.
+         * ============================================================
+         * HYDRAULIK / GROSSVISU
+         * ============================================================
+         */
+
+        /*
+         * B1:
+         * Vorlauffühler FBH
          */
         $this->RegisterPropertyInteger(
             'FBHFlowID',
-            0
-        );
-
-        $this->RegisterPropertyInteger(
-            'WPStatusID',
-            16864
+            58972
         );
 
         /*
-         * Flexible Verbraucher.
+         * Q2:
+         * Heizkreis-/Mischerkreispumpe
          */
         $this->RegisterPropertyInteger(
-            'BoilerHeaterID',
-            10737
+            'Q2ID',
+            56962
         );
 
-        $this->RegisterPropertyInteger(
-            'BufferHeaterID',
-            53546
-        );
 
         /*
-         * Mehrere unmittelbar folgende Telegramme bündeln.
+         * ============================================================
+         * DIREKTE WP-BETRIEBSMELDUNGEN AUS OZW
+         * ============================================================
          */
+
+        $this->RegisterPropertyInteger(
+            'WPHeatingID',
+            44357
+        );
+
+        $this->RegisterPropertyInteger(
+            'WPCoolingID',
+            17689
+        );
+
+        $this->RegisterPropertyInteger(
+            'WPDHWID',
+            21617
+        );
+
+
+        /*
+         * ============================================================
+         * WP DIAGNOSEWERTE AUS OZW
+         * ============================================================
+         */
+
+        $this->RegisterPropertyInteger(
+            'WPCompressor1ID',
+            29853
+        );
+
+        $this->RegisterPropertyInteger(
+            'WPModulationID',
+            20837
+        );
+
+        $this->RegisterPropertyInteger(
+            'WPFlowRateID',
+            16705
+        );
+
+        $this->RegisterPropertyInteger(
+            'WPElectricalPowerID',
+            50450
+        );
+
+        $this->RegisterPropertyInteger(
+            'WPHeatOutputID',
+            32403
+        );
+
+        $this->RegisterPropertyInteger(
+            'WPCOPID',
+            37700
+        );
+
+        $this->RegisterPropertyInteger(
+            'CondenserPumpID',
+            50837
+        );
+
+        $this->RegisterPropertyInteger(
+            'CondenserPumpSpeedID',
+            32715
+        );
+
+        $this->RegisterPropertyInteger(
+            'SourcePumpID',
+            11178
+        );
+
+        $this->RegisterPropertyInteger(
+            'SourcePumpSpeedID',
+            17723
+        );
+
+        $this->RegisterPropertyInteger(
+            'SourceFlowID',
+            41957
+        );
+
+
+        /*
+         * ============================================================
+         * UPDATE
+         * ============================================================
+         */
+
         $this->RegisterPropertyInteger(
             'RenderDelay',
             800
@@ -97,9 +154,9 @@ class SulzbannHeizungVisualisierung extends IPSModule
 
 
         /*
-         * ========================================================
-         * EINE HTMLBOX
-         * ========================================================
+         * ============================================================
+         * HTMLBOX
+         * ============================================================
          */
 
         $this->RegisterVariableString(
@@ -110,9 +167,6 @@ class SulzbannHeizungVisualisierung extends IPSModule
         );
 
 
-        /*
-         * Timer standardmässig ausgeschaltet.
-         */
         $this->RegisterTimer(
             'RenderTimer',
             0,
@@ -121,28 +175,17 @@ class SulzbannHeizungVisualisierung extends IPSModule
     }
 
 
-    /*
-     * ============================================================
-     * APPLY CHANGES
-     * ============================================================
-     */
-
     public function ApplyChanges(): void
     {
         parent::ApplyChanges();
 
 
-        foreach (
-            $this->GetObservedVariableIDs()
-            as $variableID
-        ) {
+        foreach ($this->GetObservedVariableIDs() as $variableID) {
 
             if (
                 $variableID > 0
                 &&
-                IPS_VariableExists(
-                    $variableID
-                )
+                IPS_VariableExists($variableID)
             ) {
 
                 $this->RegisterMessage(
@@ -162,12 +205,6 @@ class SulzbannHeizungVisualisierung extends IPSModule
         $this->Update();
     }
 
-
-    /*
-     * ============================================================
-     * ÖFFENTLICHES UPDATE
-     * ============================================================
-     */
 
     public function Update(): void
     {
@@ -193,10 +230,6 @@ class SulzbannHeizungVisualisierung extends IPSModule
             );
 
 
-        /*
-         * Nur schreiben, wenn sich der Inhalt tatsächlich
-         * geändert hat.
-         */
         if ($current !== $html) {
 
             SetValueString(
@@ -211,12 +244,6 @@ class SulzbannHeizungVisualisierung extends IPSModule
         );
     }
 
-
-    /*
-     * ============================================================
-     * MESSAGE SINK
-     * ============================================================
-     */
 
     public function MessageSink(
         $TimeStamp,
@@ -248,10 +275,6 @@ class SulzbannHeizungVisualisierung extends IPSModule
             );
 
 
-        /*
-         * Mehrere unmittelbar folgende Änderungen werden
-         * zusammengefasst.
-         */
         $this->SetTimerInterval(
             'RenderTimer',
             $delay
@@ -259,73 +282,53 @@ class SulzbannHeizungVisualisierung extends IPSModule
     }
 
 
-    /*
-     * ============================================================
-     * BEOBACHTETE VARIABLEN
-     * ============================================================
-     */
-
     private function GetObservedVariableIDs(): array
     {
         return [
 
-            $this->ReadPropertyInteger(
-                'OutsideTempID'
-            ),
+            $this->ReadPropertyInteger('OutsideTempID'),
 
-            $this->ReadPropertyInteger(
-                'WPFlowID'
-            ),
+            $this->ReadPropertyInteger('WPFlowID'),
+            $this->ReadPropertyInteger('WPReturnID'),
 
-            $this->ReadPropertyInteger(
-                'WPReturnID'
-            ),
+            $this->ReadPropertyInteger('BoilerTopID'),
+            $this->ReadPropertyInteger('BoilerBottomID'),
 
-            $this->ReadPropertyInteger(
-                'BoilerTopID'
-            ),
+            $this->ReadPropertyInteger('BufferTopID'),
+            $this->ReadPropertyInteger('BufferMiddleID'),
+            $this->ReadPropertyInteger('BufferBottomID'),
 
-            $this->ReadPropertyInteger(
-                'BoilerBottomID'
-            ),
+            $this->ReadPropertyInteger('FBHFlowID'),
+            $this->ReadPropertyInteger('Q2ID'),
 
-            $this->ReadPropertyInteger(
-                'BufferTopID'
-            ),
+            $this->ReadPropertyInteger('WPStatusID'),
 
-            $this->ReadPropertyInteger(
-                'BufferMiddleID'
-            ),
+            $this->ReadPropertyInteger('BoilerHeaterID'),
+            $this->ReadPropertyInteger('BufferHeaterID'),
 
-            $this->ReadPropertyInteger(
-                'BufferBottomID'
-            ),
+            $this->ReadPropertyInteger('WPHeatingID'),
+            $this->ReadPropertyInteger('WPCoolingID'),
+            $this->ReadPropertyInteger('WPDHWID'),
 
-            $this->ReadPropertyInteger(
-                'FBHFlowID'
-            ),
+            $this->ReadPropertyInteger('WPCompressor1ID'),
+            $this->ReadPropertyInteger('WPModulationID'),
+            $this->ReadPropertyInteger('WPFlowRateID'),
 
-            $this->ReadPropertyInteger(
-                'WPStatusID'
-            ),
+            $this->ReadPropertyInteger('WPElectricalPowerID'),
+            $this->ReadPropertyInteger('WPHeatOutputID'),
+            $this->ReadPropertyInteger('WPCOPID'),
 
-            $this->ReadPropertyInteger(
-                'BoilerHeaterID'
-            ),
+            $this->ReadPropertyInteger('CondenserPumpID'),
+            $this->ReadPropertyInteger('CondenserPumpSpeedID'),
 
-            $this->ReadPropertyInteger(
-                'BufferHeaterID'
-            )
+            $this->ReadPropertyInteger('SourcePumpID'),
+            $this->ReadPropertyInteger('SourcePumpSpeedID'),
+
+            $this->ReadPropertyInteger('SourceFlowID')
 
         ];
     }
 
-
-    /*
-     * ============================================================
-     * WERT SICHER LESEN
-     * ============================================================
-     */
 
     private function ReadValueSafe(
         int $variableID,
@@ -335,9 +338,7 @@ class SulzbannHeizungVisualisierung extends IPSModule
         if (
             $variableID <= 0
             ||
-            !IPS_VariableExists(
-                $variableID
-            )
+            !IPS_VariableExists($variableID)
         ) {
 
             return $default;
@@ -357,12 +358,6 @@ class SulzbannHeizungVisualisierung extends IPSModule
     }
 
 
-    /*
-     * ============================================================
-     * FLOAT
-     * ============================================================
-     */
-
     private function ReadFloat(
         int $variableID
     ): ?float {
@@ -377,9 +372,7 @@ class SulzbannHeizungVisualisierung extends IPSModule
         if (
             $value === null
             ||
-            !is_numeric(
-                $value
-            )
+            !is_numeric($value)
         ) {
 
             return null;
@@ -390,11 +383,30 @@ class SulzbannHeizungVisualisierung extends IPSModule
     }
 
 
-    /*
-     * ============================================================
-     * BOOL
-     * ============================================================
-     */
+    private function ReadInteger(
+        int $variableID
+    ): ?int {
+
+        $value =
+            $this->ReadValueSafe(
+                $variableID,
+                null
+            );
+
+
+        if (
+            $value === null
+            ||
+            !is_numeric($value)
+        ) {
+
+            return null;
+        }
+
+
+        return (int) $value;
+    }
+
 
     private function ReadBool(
         int $variableID
@@ -426,12 +438,6 @@ class SulzbannHeizungVisualisierung extends IPSModule
     }
 
 
-    /*
-     * ============================================================
-     * TEMPERATUR FORMATIEREN
-     * ============================================================
-     */
-
     private function FormatTemperature(
         ?float $value
     ): string {
@@ -454,11 +460,86 @@ class SulzbannHeizungVisualisierung extends IPSModule
     }
 
 
-    /*
-     * ============================================================
-     * HTML ESCAPE
-     * ============================================================
-     */
+    private function FormatPower(
+        ?float $value
+    ): string {
+
+        if ($value === null) {
+
+            return '—';
+        }
+
+
+        return
+            number_format(
+                $value,
+                2,
+                '.',
+                ''
+            )
+            .
+            ' kW';
+    }
+
+
+    private function FormatFlow(
+        ?float $value
+    ): string {
+
+        if ($value === null) {
+
+            return '—';
+        }
+
+
+        return
+            number_format(
+                $value,
+                1,
+                '.',
+                ''
+            )
+            .
+            ' l/min';
+    }
+
+
+    private function FormatPercent(
+        ?int $value
+    ): string {
+
+        if ($value === null) {
+
+            return '—';
+        }
+
+
+        return
+            $value
+            .
+            ' %';
+    }
+
+
+    private function FormatCOP(
+        ?float $value
+    ): string {
+
+        if ($value === null) {
+
+            return '—';
+        }
+
+
+        return
+            number_format(
+                $value,
+                2,
+                '.',
+                ''
+            );
+    }
+
 
     private function H(
         string $value
@@ -472,12 +553,6 @@ class SulzbannHeizungVisualisierung extends IPSModule
         );
     }
 
-
-    /*
-     * ============================================================
-     * TEMPLATE
-     * ============================================================
-     */
 
     private function LoadTemplate(): string
     {
@@ -519,11 +594,55 @@ class SulzbannHeizungVisualisierung extends IPSModule
     }
 
 
-    /*
-     * ============================================================
-     * VISUALISIERUNG
-     * ============================================================
-     */
+    private function DetermineWPMode(
+        bool $heating,
+        bool $cooling,
+        bool $dhw
+    ): array {
+
+        /*
+         * Direkte OZW-Betriebsmeldungen der Wärmepumpe.
+         *
+         * Priorität Warmwasser > Kühlen > Heizen.
+         */
+
+        if ($dhw) {
+
+            return [
+                'text'  => 'Warmwasser',
+                'class' => 'mode-dhw',
+                'color' => '#ffc928'
+            ];
+        }
+
+
+        if ($cooling) {
+
+            return [
+                'text'  => 'Kühlen',
+                'class' => 'mode-cooling',
+                'color' => '#35a9ff'
+            ];
+        }
+
+
+        if ($heating) {
+
+            return [
+                'text'  => 'Heizen',
+                'class' => 'mode-heating',
+                'color' => '#ff5a55'
+            ];
+        }
+
+
+        return [
+            'text'  => 'Standby',
+            'class' => 'mode-standby',
+            'color' => '#78909c'
+        ];
+    }
+
 
     private function BuildVisualization(): string
     {
@@ -629,7 +748,7 @@ class SulzbannHeizungVisualisierung extends IPSModule
 
         /*
          * ========================================================
-         * WP STATUS
+         * KOMPAKTVISU WP STATUS
          * ========================================================
          */
 
@@ -657,10 +776,6 @@ class SulzbannHeizungVisualisierung extends IPSModule
                 'Verdichter Aus';
 
 
-        $wpStateDetail =
-            $wpStateGraphic;
-
-
         $wpActiveClass =
             $wpActive
                 ?
@@ -675,6 +790,216 @@ class SulzbannHeizungVisualisierung extends IPSModule
                 '#25db90'
                 :
                 '#78909c';
+
+
+        /*
+         * ========================================================
+         * DIREKTER WP MODUS AUS OZW
+         * ========================================================
+         */
+
+        $heating =
+            $this->ReadBool(
+                $this->ReadPropertyInteger(
+                    'WPHeatingID'
+                )
+            );
+
+
+        $cooling =
+            $this->ReadBool(
+                $this->ReadPropertyInteger(
+                    'WPCoolingID'
+                )
+            );
+
+
+        $dhw =
+            $this->ReadBool(
+                $this->ReadPropertyInteger(
+                    'WPDHWID'
+                )
+            );
+
+
+        $wpMode =
+            $this->DetermineWPMode(
+                $heating,
+                $cooling,
+                $dhw
+            );
+
+
+        /*
+         * ========================================================
+         * Q2
+         * ========================================================
+         */
+
+        $q2Active =
+            $this->ReadBool(
+                $this->ReadPropertyInteger(
+                    'Q2ID'
+                )
+            );
+
+
+        $q2Text =
+            $q2Active
+                ?
+                'Ein'
+                :
+                'Aus';
+
+
+        $q2Class =
+            $q2Active
+                ?
+                'active'
+                :
+                '';
+
+
+        $q2Color =
+            $q2Active
+                ?
+                '#25db90'
+                :
+                '#78909c';
+
+
+        /*
+         * ========================================================
+         * DIAGNOSE
+         * ========================================================
+         */
+
+        $compressor =
+            $this->ReadBool(
+                $this->ReadPropertyInteger(
+                    'WPCompressor1ID'
+                )
+            );
+
+
+        $compressorText =
+            $compressor
+                ?
+                'Ein'
+                :
+                'Aus';
+
+
+        $modulation =
+            $this->FormatPercent(
+                $this->ReadInteger(
+                    $this->ReadPropertyInteger(
+                        'WPModulationID'
+                    )
+                )
+            );
+
+
+        $flowRate =
+            $this->FormatFlow(
+                $this->ReadFloat(
+                    $this->ReadPropertyInteger(
+                        'WPFlowRateID'
+                    )
+                )
+            );
+
+
+        $electricalPower =
+            $this->FormatPower(
+                $this->ReadFloat(
+                    $this->ReadPropertyInteger(
+                        'WPElectricalPowerID'
+                    )
+                )
+            );
+
+
+        $heatOutput =
+            $this->FormatPower(
+                $this->ReadFloat(
+                    $this->ReadPropertyInteger(
+                        'WPHeatOutputID'
+                    )
+                )
+            );
+
+
+        $cop =
+            $this->FormatCOP(
+                $this->ReadFloat(
+                    $this->ReadPropertyInteger(
+                        'WPCOPID'
+                    )
+                )
+            );
+
+
+        $condenserPump =
+            $this->ReadBool(
+                $this->ReadPropertyInteger(
+                    'CondenserPumpID'
+                )
+            );
+
+
+        $condenserPumpText =
+            $condenserPump
+                ?
+                'Ein'
+                :
+                'Aus';
+
+
+        $condenserPumpSpeed =
+            $this->FormatPercent(
+                $this->ReadInteger(
+                    $this->ReadPropertyInteger(
+                        'CondenserPumpSpeedID'
+                    )
+                )
+            );
+
+
+        $sourcePump =
+            $this->ReadBool(
+                $this->ReadPropertyInteger(
+                    'SourcePumpID'
+                )
+            );
+
+
+        $sourcePumpText =
+            $sourcePump
+                ?
+                'Ein'
+                :
+                'Aus';
+
+
+        $sourcePumpSpeed =
+            $this->FormatPercent(
+                $this->ReadInteger(
+                    $this->ReadPropertyInteger(
+                        'SourcePumpSpeedID'
+                    )
+                )
+            );
+
+
+        $sourceFlow =
+            $this->FormatFlow(
+                $this->ReadFloat(
+                    $this->ReadPropertyInteger(
+                        'SourceFlowID'
+                    )
+                )
+            );
 
 
         /*
@@ -724,70 +1049,96 @@ class SulzbannHeizungVisualisierung extends IPSModule
         $replace = [
 
             '{{OUTSIDE}}' =>
-                $this->H(
-                    $outside
-                ),
+                $this->H($outside),
 
             '{{WP_FLOW}}' =>
-                $this->H(
-                    $wpFlow
-                ),
+                $this->H($wpFlow),
 
             '{{WP_RETURN}}' =>
-                $this->H(
-                    $wpReturn
-                ),
+                $this->H($wpReturn),
 
             '{{BOILER_TOP}}' =>
-                $this->H(
-                    $boilerTop
-                ),
+                $this->H($boilerTop),
 
             '{{BOILER_BOTTOM}}' =>
-                $this->H(
-                    $boilerBottom
-                ),
+                $this->H($boilerBottom),
 
             '{{BUFFER_TOP}}' =>
-                $this->H(
-                    $bufferTop
-                ),
+                $this->H($bufferTop),
 
             '{{BUFFER_MIDDLE}}' =>
-                $this->H(
-                    $bufferMiddle
-                ),
+                $this->H($bufferMiddle),
 
             '{{BUFFER_BOTTOM}}' =>
-                $this->H(
-                    $bufferBottom
-                ),
+                $this->H($bufferBottom),
 
             '{{FBH_FLOW}}' =>
-                $this->H(
-                    $fbhFlow
-                ),
+                $this->H($fbhFlow),
 
             '{{WP_STATE_COMPACT}}' =>
-                $this->H(
-                    $wpStateCompact
-                ),
+                $this->H($wpStateCompact),
 
             '{{WP_STATE_GRAPHIC}}' =>
-                $this->H(
-                    $wpStateGraphic
-                ),
-
-            '{{WP_STATE_DETAIL}}' =>
-                $this->H(
-                    $wpStateDetail
-                ),
+                $this->H($wpStateGraphic),
 
             '{{WP_ACTIVE_CLASS}}' =>
                 $wpActiveClass,
 
             '{{WP_DOT_COLOR}}' =>
                 $wpDotColor,
+
+            '{{WP_MODE}}' =>
+                $this->H(
+                    $wpMode['text']
+                ),
+
+            '{{WP_MODE_CLASS}}' =>
+                $wpMode['class'],
+
+            '{{WP_MODE_COLOR}}' =>
+                $wpMode['color'],
+
+            '{{Q2_STATE}}' =>
+                $this->H($q2Text),
+
+            '{{Q2_CLASS}}' =>
+                $q2Class,
+
+            '{{Q2_COLOR}}' =>
+                $q2Color,
+
+            '{{COMPRESSOR_STATE}}' =>
+                $this->H($compressorText),
+
+            '{{WP_MODULATION}}' =>
+                $this->H($modulation),
+
+            '{{WP_FLOW_RATE}}' =>
+                $this->H($flowRate),
+
+            '{{WP_ELECTRICAL_POWER}}' =>
+                $this->H($electricalPower),
+
+            '{{WP_HEAT_OUTPUT}}' =>
+                $this->H($heatOutput),
+
+            '{{WP_COP}}' =>
+                $this->H($cop),
+
+            '{{CONDENSER_PUMP}}' =>
+                $this->H($condenserPumpText),
+
+            '{{CONDENSER_PUMP_SPEED}}' =>
+                $this->H($condenserPumpSpeed),
+
+            '{{SOURCE_PUMP}}' =>
+                $this->H($sourcePumpText),
+
+            '{{SOURCE_PUMP_SPEED}}' =>
+                $this->H($sourcePumpSpeed),
+
+            '{{SOURCE_FLOW}}' =>
+                $this->H($sourceFlow),
 
             '{{BOILER_HEATER_CLASS}}' =>
                 $boilerHeaterClass,
@@ -798,9 +1149,10 @@ class SulzbannHeizungVisualisierung extends IPSModule
         ];
 
 
-        return strtr(
-            $template,
-            $replace
-        );
+        return
+            strtr(
+                $template,
+                $replace
+            );
     }
 }
