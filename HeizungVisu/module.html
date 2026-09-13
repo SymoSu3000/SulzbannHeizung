@@ -1,34 +1,63 @@
-<!doctype html>
+<!DOCTYPE html>
 
 <html lang="de">
 
 <head>
 
-<meta charset="utf-8">
+<meta charset="UTF-8">
 
 <meta
     name="viewport"
-    content="width=device-width, initial-scale=1"
+    content="width=device-width, initial-scale=1.0"
 >
 
 <style>
 
+/* ============================================================
+   THEME
+============================================================ */
+
 :root {
+    --text: #17191c;
+    --muted: #56616a;
 
-    color-scheme: light dark;
+    --border: rgba(80, 105, 118, 0.42);
+    --borderStrong: rgba(65, 93, 108, 0.70);
 
-    --text:#111111;
-    --muted:#5c6770;
+    --yellow: #c38e00;
+    --inactive: #78909c;
 
-    --border:#7593a4;
+    --wp-fill: rgba(211, 221, 226, 0.90);
 
-    --red:#ff3f4d;
-    --blue:#1685d1;
-    --purple:#a54be0;
-    --green:#25bc7b;
+    --tank-top: #d9a7aa;
+    --tank-mid: #b9c4d0;
+    --tank-bottom: #8ebee0;
 
-    --status-off:#7f9cab;
-    --status-on:#24b980;
+    --detail-text:#ffffff;
+    --detail-muted:#b8c7cf;
+    --detail-border:#456777;
+    --detail-device:#163747;
+}
+
+
+@media (prefers-color-scheme: dark) {
+
+    :root {
+        --text: #f2f7fa;
+        --muted: #a8bdc9;
+
+        --border: rgba(102, 142, 162, 0.38);
+        --borderStrong: rgba(150, 188, 207, 0.72);
+
+        --yellow: #ffc928;
+        --inactive: #667d89;
+
+        --wp-fill: rgba(15, 43, 56, 0.88);
+
+        --tank-top: #873743;
+        --tank-mid: #424e70;
+        --tank-bottom: #145ba2;
+    }
 }
 
 
@@ -37,22 +66,21 @@
 ============================================================ */
 
 * {
-    box-sizing:border-box;
+    box-sizing: border-box;
 }
 
 
 html,
 body {
+    width: 100%;
+    height: 100%;
 
-    margin:0;
-    padding:0;
+    margin: 0;
+    padding: 0;
 
-    width:100%;
-    height:100%;
+    overflow: hidden;
 
-    overflow:hidden;
-
-    background:transparent;
+    background: transparent;
 
     font-family:
         -apple-system,
@@ -60,648 +88,324 @@ body {
         "Segoe UI",
         Arial,
         sans-serif;
+
+    color: var(--text);
 }
 
 
-body {
+#app {
+    width: 100%;
+    height: 100%;
 
-    color:var(--text);
+    overflow: hidden;
 }
-
 
 
 /* ============================================================
-   KLEINE VISUALISIERUNG
+   KOMPAKTANSICHT
+   ORIGINALER BESTÄTIGTER STAND
 ============================================================ */
 
 .compact {
+    width: 100%;
+    height: 100%;
 
-    width:100%;
-    height:100%;
+    display: grid;
 
-    padding:12px 13px 12px 13px;
+    grid-template-rows:
+        auto
+        1fr;
 
-    display:flex;
-    flex-direction:column;
+    gap: 4px;
 
-    background:transparent;
-
-    color:var(--text);
+    padding:
+        38px
+        10px
+        8px
+        10px;
 }
-
 
 
 /* ============================================================
-   KOPF
+   STATUSZEILE OBEN
 ============================================================ */
 
-.compact-head {
+.compact-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 
-    flex:0 0 auto;
+    gap: 10px;
 
-    display:flex;
-
-    justify-content:space-between;
-    align-items:flex-start;
-
-    min-height:78px;
+    min-height: 26px;
 }
 
 
-.compact-head-left {
+.compact-wp-state {
+    display: flex;
+    align-items: center;
 
-    min-width:0;
-}
+    gap: 7px;
 
-
-.compact-title {
-
-    margin:0;
-
-    font-size:16px;
-    line-height:20px;
-
-    font-weight:500;
-
-    white-space:nowrap;
-}
-
-
-.compact-status-line {
-
-    display:flex;
-
-    align-items:center;
-
-    gap:6px;
-
-    margin-top:8px;
-
-    font-size:11px;
-
-    color:var(--muted);
+    min-width: 0;
 }
 
 
 .status-dot {
+    width: 10px;
+    height: 10px;
 
-    display:inline-block;
+    flex: 0 0 10px;
 
-    width:8px;
-    height:8px;
+    border-radius: 50%;
 
-    flex:0 0 8px;
-
-    border-radius:50%;
-
-    background:var(--status-off);
+    background: var(--inactive);
 }
 
 
-.status-dot.on {
+.status-dot.active {
+    background: #25db90;
 
-    background:var(--status-on);
+    box-shadow:
+        0 0 8px
+        rgba(37, 219, 144, 0.65);
 }
 
 
-.compact-status-title {
+.compact-state-main {
+    font-size: 13px;
+    font-weight: 700;
 
-    font-weight:700;
+    color: var(--text);
 
-    color:#3e474c;
+    white-space: nowrap;
 }
 
 
-.compact-status-value {
+.compact-state-sub {
+    margin-left: 3px;
 
-    font-weight:400;
+    font-size: 13px;
+    font-weight: 400;
 
-    color:var(--muted);
+    color: var(--muted);
 }
 
-
-
-/* ============================================================
-   AUSSENTEMPERATUR
-============================================================ */
 
 .compact-outside {
+    flex: 0 0 auto;
 
-    text-align:right;
-
-    white-space:nowrap;
-
-    padding-top:21px;
+    text-align: right;
 }
 
 
 .compact-outside-label {
+    font-size: 13px;
 
-    display:block;
-
-    margin-bottom:2px;
-
-    font-size:10px;
-    line-height:12px;
-
-    color:var(--muted);
+    color: var(--muted);
 }
 
 
 .compact-outside-value {
+    margin-top: 1px;
 
-    display:block;
+    font-size: 15px;
+    font-weight: 700;
 
-    font-size:14px;
-    line-height:17px;
-
-    font-weight:700;
-
-    color:var(--text);
+    color: var(--text);
 }
 
 
-
 /* ============================================================
-   KARTENBEREICH
+   GRAFIK
 ============================================================ */
 
-.compact-cards {
+.compact-schema-wrap {
+    min-height: 0;
 
-    flex:1 1 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
-    min-height:0;
+    overflow: hidden;
+}
 
-    display:grid;
 
-    grid-template-columns:
-        repeat(
-            3,
-            minmax(0,1fr)
+.compact-schema {
+    display: block;
+
+    width: 100%;
+    height: 100%;
+
+    max-height: 100%;
+}
+
+
+/* ============================================================
+   KOMPONENTEN
+============================================================ */
+
+.compact-component-box {
+    fill: var(--wp-fill);
+
+    stroke: var(--borderStrong);
+
+    stroke-width: 1.5;
+
+    vector-effect: non-scaling-stroke;
+}
+
+
+.compact-tank {
+    fill: url(#compactTankGradient);
+
+    stroke: var(--borderStrong);
+
+    stroke-width: 1.6;
+
+    vector-effect: non-scaling-stroke;
+}
+
+
+.compact-svg-title {
+    fill: var(--text);
+
+    font-size: 30px;
+    font-weight: 700;
+}
+
+
+.compact-svg-label {
+    fill: var(--muted);
+
+    font-size: 27px;
+    font-weight: 500;
+}
+
+
+.compact-svg-value {
+    fill: var(--text);
+
+    font-size: 29px;
+    font-weight: 700;
+}
+
+
+.compact-graphic-state {
+    font-size: 24px;
+    font-weight: 500;
+}
+
+
+.compact-wp-circle {
+    fill: none;
+
+    stroke: var(--borderStrong);
+
+    stroke-width: 4;
+
+    vector-effect: non-scaling-stroke;
+}
+
+
+.compact-wp-dot {
+    fill: var(--inactive);
+}
+
+
+.compact-wp-dot.active {
+    fill: #25db90;
+
+    filter:
+        drop-shadow(
+            0 0 5px
+            rgba(37, 219, 144, 0.65)
         );
-
-    align-items:center;
-
-    gap:26px;
-
-    padding:
-        6px
-        8px
-        4px
-        8px;
 }
-
 
 
 /* ============================================================
-   GEMEINSAME KARTE
+   HEIZSTÄBE
 ============================================================ */
 
-.device-card {
+.compact-heater {
+    fill:
+        rgba(255, 201, 40, 0.04);
 
-    position:relative;
+    stroke:
+        #7d7764;
 
-    width:100%;
+    stroke-width: 2;
 
-    height:147px;
-
-    min-width:0;
-
-    border:
-        1.5px solid
-        #7897a8;
-
-    border-radius:10px;
-
-    overflow:hidden;
-
-    color:#111111;
-
-    box-shadow:
-        inset
-        0
-        0
-        0
-        1px
-        rgba(255,255,255,0.12);
+    vector-effect: non-scaling-stroke;
 }
 
 
-.device-card.wp {
+.compact-heater.active {
+    fill:
+        rgba(255, 201, 40, 0.16);
 
-    background:
-        linear-gradient(
-            180deg,
-            #e3ebef 0%,
-            #d3e0e7 100%
+    stroke: var(--yellow);
+
+    filter:
+        drop-shadow(
+            0 0 6px
+            rgba(255, 201, 40, 0.7)
         );
 }
 
 
-.device-card.boiler,
-.device-card.buffer {
+.compact-heater-letter {
+    fill: #716c60;
 
-    background:
-        linear-gradient(
-            180deg,
-            #dab0b4 0%,
-            #d7bbc0 23%,
-            #bed0dc 58%,
-            #78bae0 100%
-        );
+    font-size: 21px;
+    font-weight: 800;
 }
 
+
+.compact-heater-letter.active {
+    fill: var(--yellow);
+}
 
 
 /* ============================================================
-   KARTENTITEL
-============================================================ */
-
-.device-title {
-
-    position:absolute;
-
-    left:0;
-    right:0;
-
-    top:5px;
-
-    text-align:center;
-
-    font-size:14px;
-
-    font-weight:700;
-}
-
-
-
-/* ============================================================
-   WÄRMEPUMPE
-============================================================ */
-
-.wp-symbol {
-
-    position:absolute;
-
-    left:50%;
-    top:29px;
-
-    width:46px;
-    height:46px;
-
-    transform:
-        translateX(-50%);
-
-    border:
-        4px solid
-        #718b99;
-
-    border-radius:50%;
-}
-
-
-.wp-state {
-
-    position:absolute;
-
-    left:0;
-    right:0;
-
-    top:78px;
-
-    display:flex;
-
-    align-items:center;
-    justify-content:center;
-
-    gap:6px;
-
-    font-size:11px;
-
-    color:#5b6870;
-}
-
-
-.wp-state-dot {
-
-    width:7px;
-    height:7px;
-
-    border-radius:50%;
-
-    background:var(--status-off);
-}
-
-
-.wp-state-dot.on {
-
-    background:var(--status-on);
-}
-
-
-.wp-values {
-
-    position:absolute;
-
-    left:13px;
-    right:11px;
-
-    bottom:8px;
-}
-
-
-.wp-row {
-
-    display:flex;
-
-    justify-content:space-between;
-    align-items:center;
-
-    gap:7px;
-
-    margin-top:4px;
-
-    font-size:12px;
-}
-
-
-.wp-row span {
-
-    color:#5e6970;
-}
-
-
-.wp-row strong {
-
-    white-space:nowrap;
-
-    font-size:13px;
-
-    font-weight:700;
-}
-
-
-
-/* ============================================================
-   BOILER
-============================================================ */
-
-.boiler-label-top {
-
-    position:absolute;
-
-    left:10px;
-    top:31px;
-
-    font-size:12px;
-
-    color:#626c73;
-}
-
-
-.boiler-value-top {
-
-    position:absolute;
-
-    right:10px;
-    top:29px;
-
-    font-size:13px;
-
-    font-weight:700;
-}
-
-
-.boiler-coil {
-
-    position:absolute;
-
-    left:50%;
-    top:54px;
-
-    width:76px;
-    height:45px;
-
-    transform:
-        translateX(-50%);
-}
-
-
-.boiler-coil span {
-
-    position:absolute;
-
-    left:0;
-
-    width:73px;
-
-    height:4px;
-
-    background:#617e8d;
-
-    transform:
-        rotate(-6deg);
-
-    transform-origin:center;
-}
-
-
-.boiler-coil span:nth-child(1) {
-    top:0;
-}
-
-
-.boiler-coil span:nth-child(2) {
-    top:9px;
-}
-
-
-.boiler-coil span:nth-child(3) {
-    top:18px;
-}
-
-
-.boiler-coil span:nth-child(4) {
-    top:27px;
-}
-
-
-.boiler-coil span:nth-child(5) {
-    top:36px;
-}
-
-
-.boiler-label-bottom {
-
-    position:absolute;
-
-    left:10px;
-    bottom:12px;
-
-    font-size:12px;
-
-    color:#626c73;
-}
-
-
-.boiler-value-bottom {
-
-    position:absolute;
-
-    right:10px;
-    bottom:11px;
-
-    font-size:13px;
-
-    font-weight:700;
-}
-
-
-
-/* ============================================================
-   PUFFER
-============================================================ */
-
-.buffer-row {
-
-    position:absolute;
-
-    left:10px;
-    right:10px;
-
-    display:flex;
-
-    justify-content:space-between;
-    align-items:center;
-
-    gap:7px;
-
-    font-size:12px;
-}
-
-
-.buffer-row span {
-
-    color:#626c73;
-}
-
-
-.buffer-row strong {
-
-    font-size:13px;
-
-    font-weight:700;
-
-    white-space:nowrap;
-}
-
-
-.buffer-row.top {
-
-    top:30px;
-}
-
-
-.buffer-row.middle {
-
-    top:68px;
-}
-
-
-.buffer-row.bottom {
-
-    bottom:12px;
-}
-
-
-
-/* ============================================================
-   HEIZSTAB-SYMBOL
-============================================================ */
-
-.heater-indicator {
-
-    position:absolute;
-
-    right:6px;
-    bottom:3px;
-
-    width:18px;
-    height:15px;
-
-    display:flex;
-
-    align-items:center;
-    justify-content:center;
-
-    border:
-        2px solid
-        #6d8997;
-
-    font-size:10px;
-
-    font-weight:700;
-
-    color:#607982;
-
-    background:
-        rgba(244,221,155,0.75);
-}
-
-
-.heater-indicator.on {
-
-    background:#ffdf6a;
-
-    border-color:#c9951c;
-
-    color:#594400;
-}
-
-
-
-/* ============================================================
-   GROSSANSICHT
+   DETAIL / GROSSANSICHT
 ============================================================ */
 
 .detail {
+    display: none;
 
-    display:none;
+    width: 100%;
+    height: 100%;
 
-    width:100%;
-    height:100%;
+    overflow: auto;
 
-    overflow:auto;
-
-    color:#ffffff;
+    color: var(--detail-text);
 }
 
 
 .schema-wrap {
+    width: 100%;
+    height: 100%;
 
-    width:100%;
-    height:100%;
-
-    overflow:auto;
+    overflow: auto;
 }
 
 
 .schema {
+    display: block;
 
-    display:block;
+    width: 100%;
+    height: 100%;
 
-    width:100%;
-    height:100%;
-
-    min-width:1000px;
+    min-width: 1000px;
 }
 
 
 .schema text {
+    fill: var(--detail-text);
 
-    fill:#ffffff;
-
-    stroke:none;
+    stroke: none;
 
     font-family:
         -apple-system,
@@ -713,163 +417,152 @@ body {
 
 
 .schema-bg {
-
-    fill:#071721;
+    fill: #071721;
 }
 
 
 .schema-border {
+    fill: none;
 
-    fill:none;
+    stroke: #294554;
 
-    stroke:#294554;
-
-    stroke-width:1.5;
+    stroke-width: 1.5;
 }
 
 
 .component-surface {
+    fill: #102838;
 
-    fill:#102838;
+    stroke: #7293a5;
 
-    stroke:#7293a5;
-
-    stroke-width:1.5;
+    stroke-width: 1.5;
 }
 
 
 .tank-surface {
+    fill: url(#detailTankGradient);
 
-    fill:url(#tankGradient);
+    stroke: #7293a5;
 
-    stroke:#7293a5;
-
-    stroke-width:1.5;
+    stroke-width: 1.5;
 }
 
 
 .schema-title {
+    font-size: 20px;
 
-    font-size:20px;
-
-    font-weight:700;
+    font-weight: 700;
 }
 
 
 .schema-main-title {
+    font-size: 28px;
 
-    font-size:28px;
-
-    font-weight:700;
+    font-weight: 700;
 }
 
 
 .schema-subtitle {
+    font-size: 13px;
 
-    font-size:13px;
-
-    fill:#b8c7cf;
+    fill: var(--detail-muted);
 }
 
 
 .schema-label {
-
-    font-size:13px;
+    font-size: 13px;
 }
 
 
 .schema-value {
+    font-size: 18px;
 
-    font-size:18px;
-
-    font-weight:700;
+    font-weight: 700;
 }
 
 
-
 /* ============================================================
-   COMPACT / GROSS UMSCHALTUNG
+   UMSCHALTUNG KLEIN / GROSS
 ============================================================ */
 
 /*
- * Normale Kachel = kleine Visu
- * Vergrösserte HTMLBox = Hydraulikschema
+ * Normale Kachel:
+ * Originale Compact-Ansicht.
+ *
+ * Vergrösserte HTMLBox:
+ * Hydraulikschema.
  */
 
-@media (min-height:520px) {
+@media (min-height: 520px) {
 
     body {
+        overflow: auto;
 
-        overflow:auto;
-
-        background:#071721;
+        background: #071721;
     }
 
 
     .compact {
-
-        display:none;
+        display: none;
     }
 
 
     .detail {
-
-        display:block;
+        display: block;
     }
-
 }
 
 
-
 /* ============================================================
-   RESPONSIVE COMPACT
+   MOBILE - ORIGINAL
 ============================================================ */
 
-@media (max-width:520px) {
+@media (max-width: 700px) {
 
     .compact {
-
         padding:
-            11px
-            10px;
+            42px
+            7px
+            7px
+            7px;
     }
 
 
-    .compact-cards {
-
-        gap:12px;
-
-        padding-left:0;
-        padding-right:0;
+    .compact-state-main,
+    .compact-state-sub,
+    .compact-outside-label {
+        font-size: 12px;
     }
 
 
-    .device-card {
-
-        height:147px;
+    .compact-outside-value {
+        font-size: 14px;
     }
 
 
-    .device-title {
-
-        font-size:13px;
+    .compact-svg-title {
+        font-size: 28px;
     }
 
 
-    .wp-row {
-
-        font-size:11px;
+    .compact-svg-label {
+        font-size: 25px;
     }
 
 
-    .wp-row strong,
-    .boiler-value-top,
-    .boiler-value-bottom,
-    .buffer-row strong {
-
-        font-size:12px;
+    .compact-svg-value {
+        font-size: 28px;
     }
 
+
+    .compact-graphic-state {
+        font-size: 22px;
+    }
+
+
+    .compact-heater-letter {
+        font-size: 20px;
+    }
 }
 
 </style>
@@ -879,1169 +572,1273 @@ body {
 
 <body>
 
-
-<!-- ============================================================
-     KLEINE VISUALISIERUNG
-============================================================ -->
-
-<div class="compact">
+<div id="app">
 
 
-    <!-- KOPF -->
+    <!-- ========================================================
+         ORIGINAL KLEINE VISUALISIERUNG
+    ========================================================= -->
 
-    <div class="compact-head">
-
-
-        <div class="compact-head-left">
-
-
-            <div class="compact-title">
-                Heizung Visualisierung
-            </div>
+    <div class="compact">
 
 
-            <div class="compact-status-line">
+        <div class="compact-top">
 
+            <div class="compact-wp-state">
 
                 <span
-                    class="status-dot {{WP_STATUS_CLASS}}"
+                    class="status-dot {{WP_ACTIVE_CLASS}}"
                 ></span>
 
+                <div class="compact-state-main">
 
-                <span class="compact-status-title">
                     WP
-                </span>
 
-
-                <span class="compact-status-value">
-                    {{WP_STATE_COMPACT}}
-                </span>
-
-
-            </div>
-
-
-        </div>
-
-
-
-        <div class="compact-outside">
-
-
-            <span class="compact-outside-label">
-                Aussen
-            </span>
-
-
-            <strong class="compact-outside-value">
-                {{OUTSIDE}}
-            </strong>
-
-
-        </div>
-
-
-    </div>
-
-
-
-    <!-- KARTEN -->
-
-    <div class="compact-cards">
-
-
-        <!-- =====================================================
-             WÄRMEPUMPE
-        ====================================================== -->
-
-        <div class="device-card wp">
-
-
-            <div class="device-title">
-                Wärmepumpe
-            </div>
-
-
-            <div class="wp-symbol"></div>
-
-
-            <div class="wp-state">
-
-
-                <span
-                    class="wp-state-dot {{WP_STATUS_CLASS}}"
-                ></span>
-
-
-                <span>
-                    Verdichter {{WP_STATE_COMPACT}}
-                </span>
-
-
-            </div>
-
-
-            <div class="wp-values">
-
-
-                <div class="wp-row">
-
-
-                    <span>
-                        Vorlauf
+                    <span class="compact-state-sub">
+                        {{WP_STATE_COMPACT}}
                     </span>
-
-
-                    <strong>
-                        {{WP_FLOW}}
-                    </strong>
-
 
                 </div>
 
-
-                <div class="wp-row">
-
-
-                    <span>
-                        Rücklauf
-                    </span>
+            </div>
 
 
-                    <strong>
-                        {{WP_RETURN}}
-                    </strong>
+            <div class="compact-outside">
 
-
+                <div class="compact-outside-label">
+                    Aussen
                 </div>
 
+                <div class="compact-outside-value">
+                    {{OUTSIDE}}
+                </div>
 
             </div>
-
 
         </div>
 
 
 
-        <!-- =====================================================
-             BOILER
-        ====================================================== -->
+        <div class="compact-schema-wrap">
 
-        <div class="device-card boiler">
-
-
-            <div class="device-title">
-                Boiler
-            </div>
+            <svg
+                class="compact-schema"
+                viewBox="0 0 900 335"
+                preserveAspectRatio="xMidYMid meet"
+            >
 
 
-            <div class="boiler-label-top">
-                oben
-            </div>
+                <defs>
 
+                    <linearGradient
+                        id="compactTankGradient"
+                        x1="0"
+                        y1="0"
+                        x2="0"
+                        y2="1"
+                    >
 
-            <div class="boiler-value-top">
-                {{BOILER_TOP}}
-            </div>
+                        <stop
+                            offset="0%"
+                            stop-color="var(--tank-top)"
+                        />
 
+                        <stop
+                            offset="50%"
+                            stop-color="var(--tank-mid)"
+                        />
 
-            <div class="boiler-coil">
+                        <stop
+                            offset="100%"
+                            stop-color="var(--tank-bottom)"
+                        />
 
-                <span></span>
-                <span></span>
-                <span></span>
-                <span></span>
-                <span></span>
+                    </linearGradient>
 
-            </div>
-
-
-            <div class="boiler-label-bottom">
-                unten
-            </div>
-
-
-            <div class="boiler-value-bottom">
-                {{BOILER_BOTTOM}}
-            </div>
-
-
-            <div class="heater-indicator {{BOILER_HEATER_CLASS}}">
-                E
-            </div>
-
-
-        </div>
+                </defs>
 
 
 
-        <!-- =====================================================
-             PUFFER
-        ====================================================== -->
+                <!-- WÄRMEPUMPE -->
 
-        <div class="device-card buffer">
-
-
-            <div class="device-title">
-                Puffer
-            </div>
-
-
-            <div class="buffer-row top">
+                <rect
+                    class="compact-component-box"
+                    x="15"
+                    y="20"
+                    width="255"
+                    height="285"
+                    rx="18"
+                />
 
 
-                <span>
+                <text
+                    class="compact-svg-title"
+                    x="142"
+                    y="55"
+                    text-anchor="middle"
+                >
+                    Wärmepumpe
+                </text>
+
+
+                <circle
+                    class="compact-wp-circle"
+                    cx="142"
+                    cy="122"
+                    r="42"
+                />
+
+
+                <circle
+                    class="compact-wp-dot {{WP_ACTIVE_CLASS}}"
+                    cx="91"
+                    cy="190"
+                    r="7"
+                />
+
+
+                <text
+                    class="compact-svg-label compact-graphic-state"
+                    x="108"
+                    y="197"
+                >
+                    {{WP_STATE_GRAPHIC}}
+                </text>
+
+
+                <text
+                    class="compact-svg-label"
+                    x="43"
+                    y="240"
+                >
+                    Vorlauf
+                </text>
+
+
+                <text
+                    class="compact-svg-value"
+                    x="245"
+                    y="240"
+                    text-anchor="end"
+                >
+                    {{WP_FLOW}}
+                </text>
+
+
+                <text
+                    class="compact-svg-label"
+                    x="43"
+                    y="281"
+                >
+                    Rücklauf
+                </text>
+
+
+                <text
+                    class="compact-svg-value"
+                    x="245"
+                    y="281"
+                    text-anchor="end"
+                >
+                    {{WP_RETURN}}
+                </text>
+
+
+
+                <!-- BOILER -->
+
+                <rect
+                    class="compact-tank"
+                    x="323"
+                    y="20"
+                    width="250"
+                    height="285"
+                    rx="18"
+                />
+
+
+                <text
+                    class="compact-svg-title"
+                    x="448"
+                    y="55"
+                    text-anchor="middle"
+                >
+                    Boiler
+                </text>
+
+
+                <text
+                    class="compact-svg-label"
+                    x="345"
+                    y="101"
+                >
                     oben
-                </span>
+                </text>
 
 
-                <strong>
-                    {{BUFFER_TOP}}
-                </strong>
+                <text
+                    class="compact-svg-value"
+                    x="548"
+                    y="101"
+                    text-anchor="end"
+                >
+                    {{BOILER_TOP}}
+                </text>
 
 
-            </div>
+                <!-- Wärmetauscher -->
+
+                <line
+                    class="compact-wp-circle"
+                    x1="375"
+                    y1="133"
+                    x2="520"
+                    y2="121"
+                />
+
+                <line
+                    class="compact-wp-circle"
+                    x1="375"
+                    y1="150"
+                    x2="520"
+                    y2="138"
+                />
+
+                <line
+                    class="compact-wp-circle"
+                    x1="375"
+                    y1="167"
+                    x2="520"
+                    y2="155"
+                />
+
+                <line
+                    class="compact-wp-circle"
+                    x1="375"
+                    y1="184"
+                    x2="520"
+                    y2="172"
+                />
+
+                <line
+                    class="compact-wp-circle"
+                    x1="375"
+                    y1="201"
+                    x2="520"
+                    y2="189"
+                />
 
 
-            <div class="buffer-row middle">
-
-
-                <span>
-                    mitte
-                </span>
-
-
-                <strong>
-                    {{BUFFER_MIDDLE}}
-                </strong>
-
-
-            </div>
-
-
-            <div class="buffer-row bottom">
-
-
-                <span>
+                <text
+                    class="compact-svg-label"
+                    x="345"
+                    y="263"
+                >
                     unten
-                </span>
+                </text>
 
 
-                <strong>
+                <text
+                    class="compact-svg-value"
+                    x="548"
+                    y="263"
+                    text-anchor="end"
+                >
+                    {{BOILER_BOTTOM}}
+                </text>
+
+
+                <rect
+                    class="compact-heater {{BOILER_HEATER_CLASS}}"
+                    x="520"
+                    y="270"
+                    width="33"
+                    height="28"
+                    rx="4"
+                />
+
+
+                <text
+                    class="compact-heater-letter {{BOILER_HEATER_CLASS}}"
+                    x="536.5"
+                    y="291"
+                    text-anchor="middle"
+                >
+                    E
+                </text>
+
+
+
+                <!-- PUFFER -->
+
+                <rect
+                    class="compact-tank"
+                    x="630"
+                    y="20"
+                    width="250"
+                    height="285"
+                    rx="18"
+                />
+
+
+                <text
+                    class="compact-svg-title"
+                    x="755"
+                    y="55"
+                    text-anchor="middle"
+                >
+                    Puffer
+                </text>
+
+
+                <text
+                    class="compact-svg-label"
+                    x="650"
+                    y="101"
+                >
+                    oben
+                </text>
+
+
+                <text
+                    class="compact-svg-value"
+                    x="855"
+                    y="101"
+                    text-anchor="end"
+                >
+                    {{BUFFER_TOP}}
+                </text>
+
+
+                <text
+                    class="compact-svg-label"
+                    x="650"
+                    y="175"
+                >
+                    mitte
+                </text>
+
+
+                <text
+                    class="compact-svg-value"
+                    x="855"
+                    y="175"
+                    text-anchor="end"
+                >
+                    {{BUFFER_MIDDLE}}
+                </text>
+
+
+                <text
+                    class="compact-svg-label"
+                    x="650"
+                    y="253"
+                >
+                    unten
+                </text>
+
+
+                <text
+                    class="compact-svg-value"
+                    x="855"
+                    y="253"
+                    text-anchor="end"
+                >
                     {{BUFFER_BOTTOM}}
-                </strong>
+                </text>
 
 
-            </div>
+                <rect
+                    class="compact-heater {{BUFFER_HEATER_CLASS}}"
+                    x="646"
+                    y="270"
+                    width="33"
+                    height="28"
+                    rx="4"
+                />
 
 
-            <div class="heater-indicator {{BUFFER_HEATER_CLASS}}">
-                E
-            </div>
+                <text
+                    class="compact-heater-letter {{BUFFER_HEATER_CLASS}}"
+                    x="662.5"
+                    y="291"
+                    text-anchor="middle"
+                >
+                    E
+                </text>
 
+
+            </svg>
 
         </div>
-
 
     </div>
 
 
-</div>
 
+    <!-- ========================================================
+         GROSSANSICHT
+    ========================================================= -->
 
+    <div class="detail">
 
-<!-- ============================================================
-     GROSSANSICHT
-============================================================ -->
+        <div class="schema-wrap">
 
-<div class="detail">
+            <svg
+                class="schema"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 1600 745"
+            >
 
 
-<div class="schema-wrap">
+                <defs>
 
+                    <linearGradient
+                        id="detailTankGradient"
+                        x1="0"
+                        y1="0"
+                        x2="0"
+                        y2="1"
+                    >
 
-<svg
-    class="schema"
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 1600 745"
->
+                        <stop
+                            offset="0%"
+                            stop-color="#9a4b56"
+                        />
 
+                        <stop
+                            offset="48%"
+                            stop-color="#515d7a"
+                        />
 
-<!-- ============================================================
-     DEFINITIONEN
-============================================================ -->
+                        <stop
+                            offset="100%"
+                            stop-color="#236c9d"
+                        />
 
-<defs>
+                    </linearGradient>
 
+                </defs>
 
-    <linearGradient
-        id="tankGradient"
-        x1="0"
-        y1="0"
-        x2="0"
-        y2="1"
-    >
 
-        <stop
-            offset="0%"
-            stop-color="#9a4b56"
-        />
 
-        <stop
-            offset="48%"
-            stop-color="#515d7a"
-        />
+                <!-- HINTERGRUND -->
 
-        <stop
-            offset="100%"
-            stop-color="#236c9d"
-        />
+                <rect
+                    class="schema-bg"
+                    x="0"
+                    y="0"
+                    width="1600"
+                    height="745"
+                />
 
-    </linearGradient>
 
+                <rect
+                    class="schema-border"
+                    x="14"
+                    y="14"
+                    width="1572"
+                    height="717"
+                    rx="18"
+                />
 
-</defs>
 
 
+                <!-- TITEL -->
 
-<!-- ============================================================
-     HINTERGRUND
-============================================================ -->
+                <text
+                    x="30"
+                    y="45"
+                    class="schema-main-title"
+                >
+                    Wärmepumpe / Hydraulik
+                </text>
 
-<rect
-    class="schema-bg"
-    x="0"
-    y="0"
-    width="1600"
-    height="745"
-/>
 
+                <text
+                    x="32"
+                    y="70"
+                    class="schema-subtitle"
+                >
+                    ELCO AEROTOP S09.2 · OZW / Siemens
+                </text>
 
-<rect
-    class="schema-border"
-    x="14"
-    y="14"
-    width="1572"
-    height="717"
-    rx="18"
-/>
 
 
+                <!-- WP STATUS -->
 
-<!-- ============================================================
-     TITEL
-============================================================ -->
+                <circle
+                    cx="48"
+                    cy="108"
+                    r="7"
+                    fill="{{WP_DOT_COLOR}}"
+                />
 
-<text
-    x="30"
-    y="45"
-    class="schema-main-title"
->
-    Wärmepumpe / Hydraulik
-</text>
 
-
-<text
-    x="32"
-    y="70"
-    class="schema-subtitle"
->
-    ELCO AEROTOP S09.2 · OZW / Siemens
-</text>
-
-
-
-<!-- WP STATUS -->
-
-<circle
-    cx="48"
-    cy="108"
-    r="7"
-    fill="{{WP_DOT_COLOR}}"
-/>
-
-
-<text
-    x="63"
-    y="113"
-    class="schema-label"
->
-    {{WP_STATE_DETAIL}}
-</text>
-
-
-
-<!-- AUSSEN -->
-
-<text
-    x="1465"
-    y="110"
-    text-anchor="end"
-    class="schema-label"
->
-    Aussen
-</text>
-
-
-<text
-    x="1555"
-    y="110"
-    text-anchor="end"
-    class="schema-value"
->
-    {{OUTSIDE}}
-</text>
-
-
-
-<!-- ============================================================
-     GERÄTE
-============================================================ -->
-
-<rect
-    class="component-surface"
-    x="60"
-    y="295"
-    width="220"
-    height="270"
-    rx="18"
-/>
-
-
-<rect
-    class="tank-surface"
-    x="500"
-    y="270"
-    width="240"
-    height="330"
-    rx="18"
-/>
-
-
-<rect
-    class="tank-surface"
-    x="900"
-    y="270"
-    width="240"
-    height="330"
-    rx="18"
-/>
-
-
-<rect
-    class="component-surface"
-    x="1310"
-    y="270"
-    width="220"
-    height="330"
-    rx="18"
-/>
-
-
-
-<!-- ============================================================
-     LEITUNGEN
-============================================================ -->
-
-<!-- WP VORLAUF -->
-
-<line
-    x1="280"
-    y1="355"
-    x2="390"
-    y2="355"
-    stroke="#ff3f4d"
-    stroke-width="6"
-/>
-
-<line
-    x1="390"
-    y1="355"
-    x2="390"
-    y2="185"
-    stroke="#ff3f4d"
-    stroke-width="6"
-/>
-
-<line
-    x1="390"
-    y1="185"
-    x2="1275"
-    y2="185"
-    stroke="#ff3f4d"
-    stroke-width="6"
-/>
-
-<line
-    x1="1275"
-    y1="185"
-    x2="1275"
-    y2="340"
-    stroke="#ff3f4d"
-    stroke-width="6"
-/>
-
-
-
-<!-- BOILER LADUNG -->
-
-<line
-    x1="280"
-    y1="440"
-    x2="430"
-    y2="440"
-    stroke="#a54be0"
-    stroke-width="5"
-/>
-
-<line
-    x1="430"
-    y1="440"
-    x2="500"
-    y2="440"
-    stroke="#a54be0"
-    stroke-width="5"
-/>
-
-
-
-<!-- Y47 -->
-
-<line
-    x1="1240"
-    y1="400"
-    x2="1275"
-    y2="400"
-    stroke="#ff3f4d"
-    stroke-width="6"
-/>
-
-<line
-    x1="1275"
-    y1="400"
-    x2="1275"
-    y2="340"
-    stroke="#ff3f4d"
-    stroke-width="6"
-/>
-
-<line
-    x1="1210"
-    y1="430"
-    x2="1210"
-    y2="495"
-    stroke="#ff3f4d"
-    stroke-width="6"
-/>
-
-<line
-    x1="1210"
-    y1="495"
-    x2="1140"
-    y2="495"
-    stroke="#ff3f4d"
-    stroke-width="6"
-/>
-
-<line
-    x1="1139.21232291538"
-    y1="301.6333373995567"
-    x2="1210"
-    y2="301.6333373995567"
-    stroke="#ff3f4d"
-    stroke-width="6"
-/>
-
-<line
-    x1="1210"
-    y1="301.6333373995567"
-    x2="1210"
-    y2="370"
-    stroke="#ff3f4d"
-    stroke-width="6"
-/>
-
-
-
-<!-- BOILER RÜCKLAUF -->
-
-<line
-    x1="500"
-    y1="583.2493995393183"
-    x2="430"
-    y2="583.2493995393183"
-    stroke="#1685d1"
-    stroke-width="6"
-/>
-
-<line
-    x1="430"
-    y1="583.2493995393183"
-    x2="430"
-    y2="655"
-    stroke="#1685d1"
-    stroke-width="6"
-/>
-
-
-
-<!-- PUFFER RÜCKLAUF -->
-
-<line
-    x1="899.3574614075499"
-    y1="577.9910805886045"
-    x2="820"
-    y2="577.9910805886045"
-    stroke="#1685d1"
-    stroke-width="6"
-/>
-
-<line
-    x1="820"
-    y1="577.9910805886045"
-    x2="820"
-    y2="655"
-    stroke="#1685d1"
-    stroke-width="6"
-/>
-
-
-
-<!-- GEMEINSAMER RÜCKLAUF -->
-
-<line
-    x1="820"
-    y1="655"
-    x2="430"
-    y2="655"
-    stroke="#1685d1"
-    stroke-width="6"
-/>
-
-<line
-    x1="430"
-    y1="655"
-    x2="300"
-    y2="655"
-    stroke="#1685d1"
-    stroke-width="6"
-/>
-
-<line
-    x1="300"
-    y1="655"
-    x2="300"
-    y2="500"
-    stroke="#1685d1"
-    stroke-width="6"
-/>
-
-<line
-    x1="300"
-    y1="500"
-    x2="280"
-    y2="500"
-    stroke="#1685d1"
-    stroke-width="6"
-/>
-
-
-
-<!-- FBH RÜCKLAUF -->
-
-<line
-    x1="1440.238633066829"
-    y1="458.4011352427218"
-    x2="1389.088442201554"
-    y2="458.4011352427218"
-    stroke="#1685d1"
-    stroke-width="6"
-/>
-
-<line
-    x1="1389.088442201554"
-    y1="699.2034057281654"
-    x2="1389.088442201554"
-    y2="89.76514523249011"
-    stroke="#1685d1"
-    stroke-width="6"
-/>
-
-<line
-    x1="1192.274819288892"
-    y1="699.2034057281654"
-    x2="1389.088442201554"
-    y2="699.2034057281654"
-    stroke="#1685d1"
-    stroke-width="6"
-/>
-
-<line
-    x1="1192.274819288892"
-    y1="581.0739501197281"
-    x2="1192.274819288892"
-    y2="699.2034057281654"
-    stroke="#1685d1"
-    stroke-width="6"
-/>
-
-<line
-    x1="1140.497400100281"
-    y1="581.0739501197281"
-    x2="1192.274819288892"
-    y2="581.0739501197281"
-    stroke="#1685d1"
-    stroke-width="6"
-/>
-
-
-
-<!-- FBH VORLAUF -->
-
-<line
-    x1="1275"
-    y1="400"
-    x2="1275"
-    y2="668.2469487074558"
-    stroke="#ff3f4d"
-    stroke-width="6"
-/>
-
-<line
-    x1="1275"
-    y1="668.2469487074558"
-    x2="1468.238633066829"
-    y2="668.2469487074558"
-    stroke="#ff3f4d"
-    stroke-width="6"
-/>
-
-<line
-    x1="1468.238633066829"
-    y1="668.2469487074558"
-    x2="1468.238633066829"
-    y2="486.4011352427218"
-    stroke="#ff3f4d"
-    stroke-width="6"
-/>
-
-<line
-    x1="1468.238633066829"
-    y1="430.4011352427218"
-    x2="1468.238633066829"
-    y2="424.4011352427218"
-    stroke="#ff3f4d"
-    stroke-width="6"
-/>
-
-
-
-<!-- FBH OBEN -->
-
-<line
-    x1="1389.088442201554"
-    y1="89.76514523249011"
-    x2="1404.63755297549"
-    y2="89.76514523249011"
-    stroke="#1685d1"
-    stroke-width="6"
-/>
-
-<line
-    x1="1454.63755297549"
-    y1="89.76514523249011"
-    x2="1468.238633066829"
-    y2="89.76514523249011"
-    stroke="#ff3f4d"
-    stroke-width="6"
-/>
-
-<line
-    x1="1468.238633066829"
-    y1="368.4011352427218"
-    x2="1468.238633066829"
-    y2="89.76514523249011"
-    stroke="#ff3f4d"
-    stroke-width="6"
-/>
-
-
-
-<!-- BRAUCHWARMWASSER -->
-
-<line
-    x1="499.4214030047069"
-    y1="294.87992877019906"
-    x2="449.3033927935944"
-    y2="294.87992877019906"
-    stroke="#25bc7b"
-    stroke-width="4"
-/>
-
-<line
-    x1="449.3033927935944"
-    y1="294.87992877019906"
-    x2="449.3033927935944"
-    y2="109.82881414455301"
-    stroke="#25bc7b"
-    stroke-width="4"
-/>
-
-
-
-<!-- ============================================================
-     ARMATUREN
-============================================================ -->
-
-<polygon
-    points="
-        1210,370
-        1240,400
-        1210,430
-        1180,400
-    "
-    fill="#163747"
-    stroke="#456777"
-    stroke-width="2"
-/>
-
-
-<circle
-    cx="1468.238633066829"
-    cy="396.4011352427218"
-    r="28"
-    fill="#163747"
-    stroke="#456777"
-    stroke-width="2"
-/>
-
-
-<polygon
-    points="
-        1468.238633066829,430.4011352427218
-        1496.238633066829,458.4011352427218
-        1468.238633066829,486.4011352427218
-        1440.238633066829,458.4011352427218
-    "
-    fill="#163747"
-    stroke="#456777"
-    stroke-width="2"
-/>
-
-
-
-<!-- ============================================================
-     KOMPONENTENTITEL
-============================================================ -->
-
-<text
-    x="82"
-    y="330"
-    class="schema-title"
->
-    Wärmepumpe
-</text>
-
-
-<text
-    x="82"
-    y="353"
-    class="schema-label"
->
-    ELCO AEROTOP S09.2
-</text>
-
-
-<text
-    x="515"
-    y="300"
-    class="schema-title"
->
-    Brauchwarmwasserspeicher
-</text>
-
-
-<text
-    x="585"
-    y="324"
-    class="schema-label"
->
-    Boiler
-</text>
-
-
-<text
-    x="920"
-    y="303"
-    class="schema-title"
->
-    Pufferspeicher
-</text>
-
-
-<text
-    x="1350"
-    y="300"
-    class="schema-title"
->
-    FBH-Gruppe
-</text>
-
-
-<text
-    x="1193"
-    y="351"
-    class="schema-label"
->
-    Y47
-</text>
-
-
-<text
-    x="1457"
-    y="402"
-    class="schema-label"
->
-    Q2
-</text>
-
-
-<text
-    x="1505"
-    y="462"
-    class="schema-label"
->
-    Y1
-</text>
-
-
-
-<!-- ============================================================
-     LEITUNGSBESCHRIFTUNGEN
-============================================================ -->
-
-<text
-    x="300"
-    y="326"
-    class="schema-label"
->
-    WP Heiz-/Kühl-Vorlauf → FBH
-</text>
-
-
-<text
-    x="300"
-    y="416"
-    class="schema-label"
->
-    WP Vorlauf Boiler (Ladung)
-</text>
-
-
-<text
-    x="385"
-    y="570"
-    class="schema-label"
->
-    Boiler-Rücklauf
-</text>
-
-
-<text
-    x="825"
-    y="600"
-    class="schema-label"
->
-    Puffer-Rücklauf
-</text>
-
-
-<text
-    x="315"
-    y="685"
-    class="schema-label"
->
-    Gemeinsamer Rücklauf Boiler + Puffer → WP
-</text>
-
-
-<text
-    x="465"
-    y="124"
-    class="schema-label"
->
-    Brauchwarmwasser → Haus
-</text>
-
-
-
-<!-- ============================================================
-     TEMPERATUREN
-============================================================ -->
-
-<!-- WP -->
-
-<text
-    x="88"
-    y="392"
-    class="schema-label"
->
-    WP Vorlauf
-</text>
-
-
-<text
-    x="88"
-    y="416"
-    class="schema-value"
->
-    {{WP_FLOW}}
-</text>
-
-
-<text
-    x="88"
-    y="468"
-    class="schema-label"
->
-    WP Rücklauf
-</text>
-
-
-<text
-    x="88"
-    y="492"
-    class="schema-value"
->
-    {{WP_RETURN}}
-</text>
-
-
-
-<!-- BOILER -->
-
-<text
-    x="535"
-    y="355"
-    class="schema-label"
->
-    B3 oben
-</text>
-
-
-<text
-    x="535"
-    y="379"
-    class="schema-value"
->
-    {{BOILER_TOP}}
-</text>
-
-
-<text
-    x="535"
-    y="548"
-    class="schema-label"
->
-    B31 unten
-</text>
-
-
-<text
-    x="535"
-    y="572"
-    class="schema-value"
->
-    {{BOILER_BOTTOM}}
-</text>
-
-
-
-<!-- PUFFER -->
-
-<text
-    x="935"
-    y="345"
-    class="schema-label"
->
-    B4 oben
-</text>
-
-
-<text
-    x="935"
-    y="369"
-    class="schema-value"
->
-    {{BUFFER_TOP}}
-</text>
-
-
-<text
-    x="935"
-    y="455"
-    class="schema-label"
->
-    B4.1 mitte
-</text>
-
-
-<text
-    x="935"
-    y="479"
-    class="schema-value"
->
-    {{BUFFER_MIDDLE}}
-</text>
-
-
-<text
-    x="935"
-    y="545"
-    class="schema-label"
->
-    B41 unten
-</text>
-
-
-<text
-    x="935"
-    y="569"
-    class="schema-value"
->
-    {{BUFFER_BOTTOM}}
-</text>
-
-
-
-<!-- FBH -->
-
-<text
-    x="1335"
-    y="535"
-    class="schema-label"
->
-    B1
-</text>
-
-
-<text
-    x="1335"
-    y="559"
-    class="schema-value"
->
-    {{FBH_FLOW}}
-</text>
-
-
-</svg>
-
+                <text
+                    x="63"
+                    y="113"
+                    class="schema-label"
+                >
+                    {{WP_STATE_DETAIL}}
+                </text>
+
+
+
+                <!-- AUSSEN -->
+
+                <text
+                    x="1465"
+                    y="110"
+                    text-anchor="end"
+                    class="schema-label"
+                >
+                    Aussen
+                </text>
+
+
+                <text
+                    x="1555"
+                    y="110"
+                    text-anchor="end"
+                    class="schema-value"
+                >
+                    {{OUTSIDE}}
+                </text>
+
+
+
+                <!-- GERÄTE -->
+
+                <rect
+                    class="component-surface"
+                    x="60"
+                    y="295"
+                    width="220"
+                    height="270"
+                    rx="18"
+                />
+
+
+                <rect
+                    class="tank-surface"
+                    x="500"
+                    y="270"
+                    width="240"
+                    height="330"
+                    rx="18"
+                />
+
+
+                <rect
+                    class="tank-surface"
+                    x="900"
+                    y="270"
+                    width="240"
+                    height="330"
+                    rx="18"
+                />
+
+
+                <rect
+                    class="component-surface"
+                    x="1310"
+                    y="270"
+                    width="220"
+                    height="330"
+                    rx="18"
+                />
+
+
+
+                <!-- WP VORLAUF -->
+
+                <line
+                    x1="280"
+                    y1="355"
+                    x2="390"
+                    y2="355"
+                    stroke="#ff3f4d"
+                    stroke-width="6"
+                />
+
+                <line
+                    x1="390"
+                    y1="355"
+                    x2="390"
+                    y2="185"
+                    stroke="#ff3f4d"
+                    stroke-width="6"
+                />
+
+                <line
+                    x1="390"
+                    y1="185"
+                    x2="1275"
+                    y2="185"
+                    stroke="#ff3f4d"
+                    stroke-width="6"
+                />
+
+                <line
+                    x1="1275"
+                    y1="185"
+                    x2="1275"
+                    y2="340"
+                    stroke="#ff3f4d"
+                    stroke-width="6"
+                />
+
+
+
+                <!-- BOILER LADUNG -->
+
+                <line
+                    x1="280"
+                    y1="440"
+                    x2="430"
+                    y2="440"
+                    stroke="#a54be0"
+                    stroke-width="5"
+                />
+
+                <line
+                    x1="430"
+                    y1="440"
+                    x2="500"
+                    y2="440"
+                    stroke="#a54be0"
+                    stroke-width="5"
+                />
+
+
+
+                <!-- Y47 -->
+
+                <line
+                    x1="1240"
+                    y1="400"
+                    x2="1275"
+                    y2="400"
+                    stroke="#ff3f4d"
+                    stroke-width="6"
+                />
+
+                <line
+                    x1="1275"
+                    y1="400"
+                    x2="1275"
+                    y2="340"
+                    stroke="#ff3f4d"
+                    stroke-width="6"
+                />
+
+                <line
+                    x1="1210"
+                    y1="430"
+                    x2="1210"
+                    y2="495"
+                    stroke="#ff3f4d"
+                    stroke-width="6"
+                />
+
+                <line
+                    x1="1210"
+                    y1="495"
+                    x2="1140"
+                    y2="495"
+                    stroke="#ff3f4d"
+                    stroke-width="6"
+                />
+
+                <line
+                    x1="1139.21232291538"
+                    y1="301.6333373995567"
+                    x2="1210"
+                    y2="301.6333373995567"
+                    stroke="#ff3f4d"
+                    stroke-width="6"
+                />
+
+                <line
+                    x1="1210"
+                    y1="301.6333373995567"
+                    x2="1210"
+                    y2="370"
+                    stroke="#ff3f4d"
+                    stroke-width="6"
+                />
+
+
+
+                <!-- BOILER RÜCKLAUF -->
+
+                <line
+                    x1="500"
+                    y1="583.2493995393183"
+                    x2="430"
+                    y2="583.2493995393183"
+                    stroke="#1685d1"
+                    stroke-width="6"
+                />
+
+                <line
+                    x1="430"
+                    y1="583.2493995393183"
+                    x2="430"
+                    y2="655"
+                    stroke="#1685d1"
+                    stroke-width="6"
+                />
+
+
+
+                <!-- PUFFER RÜCKLAUF -->
+
+                <line
+                    x1="899.3574614075499"
+                    y1="577.9910805886045"
+                    x2="820"
+                    y2="577.9910805886045"
+                    stroke="#1685d1"
+                    stroke-width="6"
+                />
+
+                <line
+                    x1="820"
+                    y1="577.9910805886045"
+                    x2="820"
+                    y2="655"
+                    stroke="#1685d1"
+                    stroke-width="6"
+                />
+
+
+
+                <!-- GEMEINSAMER RÜCKLAUF -->
+
+                <line
+                    x1="820"
+                    y1="655"
+                    x2="430"
+                    y2="655"
+                    stroke="#1685d1"
+                    stroke-width="6"
+                />
+
+                <line
+                    x1="430"
+                    y1="655"
+                    x2="300"
+                    y2="655"
+                    stroke="#1685d1"
+                    stroke-width="6"
+                />
+
+                <line
+                    x1="300"
+                    y1="655"
+                    x2="300"
+                    y2="500"
+                    stroke="#1685d1"
+                    stroke-width="6"
+                />
+
+                <line
+                    x1="300"
+                    y1="500"
+                    x2="280"
+                    y2="500"
+                    stroke="#1685d1"
+                    stroke-width="6"
+                />
+
+
+
+                <!-- FBH RÜCKLAUF -->
+
+                <line
+                    x1="1440.238633066829"
+                    y1="458.4011352427218"
+                    x2="1389.088442201554"
+                    y2="458.4011352427218"
+                    stroke="#1685d1"
+                    stroke-width="6"
+                />
+
+                <line
+                    x1="1389.088442201554"
+                    y1="699.2034057281654"
+                    x2="1389.088442201554"
+                    y2="89.76514523249011"
+                    stroke="#1685d1"
+                    stroke-width="6"
+                />
+
+                <line
+                    x1="1192.274819288892"
+                    y1="699.2034057281654"
+                    x2="1389.088442201554"
+                    y2="699.2034057281654"
+                    stroke="#1685d1"
+                    stroke-width="6"
+                />
+
+                <line
+                    x1="1192.274819288892"
+                    y1="581.0739501197281"
+                    x2="1192.274819288892"
+                    y2="699.2034057281654"
+                    stroke="#1685d1"
+                    stroke-width="6"
+                />
+
+                <line
+                    x1="1140.497400100281"
+                    y1="581.0739501197281"
+                    x2="1192.274819288892"
+                    y2="581.0739501197281"
+                    stroke="#1685d1"
+                    stroke-width="6"
+                />
+
+
+
+                <!-- FBH VORLAUF -->
+
+                <line
+                    x1="1275"
+                    y1="400"
+                    x2="1275"
+                    y2="668.2469487074558"
+                    stroke="#ff3f4d"
+                    stroke-width="6"
+                />
+
+                <line
+                    x1="1275"
+                    y1="668.2469487074558"
+                    x2="1468.238633066829"
+                    y2="668.2469487074558"
+                    stroke="#ff3f4d"
+                    stroke-width="6"
+                />
+
+                <line
+                    x1="1468.238633066829"
+                    y1="668.2469487074558"
+                    x2="1468.238633066829"
+                    y2="486.4011352427218"
+                    stroke="#ff3f4d"
+                    stroke-width="6"
+                />
+
+                <line
+                    x1="1468.238633066829"
+                    y1="430.4011352427218"
+                    x2="1468.238633066829"
+                    y2="424.4011352427218"
+                    stroke="#ff3f4d"
+                    stroke-width="6"
+                />
+
+
+
+                <!-- FBH OBEN -->
+
+                <line
+                    x1="1389.088442201554"
+                    y1="89.76514523249011"
+                    x2="1404.63755297549"
+                    y2="89.76514523249011"
+                    stroke="#1685d1"
+                    stroke-width="6"
+                />
+
+                <line
+                    x1="1454.63755297549"
+                    y1="89.76514523249011"
+                    x2="1468.238633066829"
+                    y2="89.76514523249011"
+                    stroke="#ff3f4d"
+                    stroke-width="6"
+                />
+
+                <line
+                    x1="1468.238633066829"
+                    y1="368.4011352427218"
+                    x2="1468.238633066829"
+                    y2="89.76514523249011"
+                    stroke="#ff3f4d"
+                    stroke-width="6"
+                />
+
+
+
+                <!-- BRAUCHWARMWASSER -->
+
+                <line
+                    x1="499.4214030047069"
+                    y1="294.87992877019906"
+                    x2="449.3033927935944"
+                    y2="294.87992877019906"
+                    stroke="#25bc7b"
+                    stroke-width="4"
+                />
+
+                <line
+                    x1="449.3033927935944"
+                    y1="294.87992877019906"
+                    x2="449.3033927935944"
+                    y2="109.82881414455301"
+                    stroke="#25bc7b"
+                    stroke-width="4"
+                />
+
+
+
+                <!-- ARMATUREN -->
+
+                <polygon
+                    points="
+                        1210,370
+                        1240,400
+                        1210,430
+                        1180,400
+                    "
+                    fill="#163747"
+                    stroke="#456777"
+                    stroke-width="2"
+                />
+
+
+                <circle
+                    cx="1468.238633066829"
+                    cy="396.4011352427218"
+                    r="28"
+                    fill="#163747"
+                    stroke="#456777"
+                    stroke-width="2"
+                />
+
+
+                <polygon
+                    points="
+                        1468.238633066829,430.4011352427218
+                        1496.238633066829,458.4011352427218
+                        1468.238633066829,486.4011352427218
+                        1440.238633066829,458.4011352427218
+                    "
+                    fill="#163747"
+                    stroke="#456777"
+                    stroke-width="2"
+                />
+
+
+
+                <!-- KOMPONENTENTITEL -->
+
+                <text
+                    x="82"
+                    y="330"
+                    class="schema-title"
+                >
+                    Wärmepumpe
+                </text>
+
+
+                <text
+                    x="82"
+                    y="353"
+                    class="schema-label"
+                >
+                    ELCO AEROTOP S09.2
+                </text>
+
+
+                <text
+                    x="515"
+                    y="300"
+                    class="schema-title"
+                >
+                    Brauchwarmwasserspeicher
+                </text>
+
+
+                <text
+                    x="585"
+                    y="324"
+                    class="schema-label"
+                >
+                    Boiler
+                </text>
+
+
+                <text
+                    x="920"
+                    y="303"
+                    class="schema-title"
+                >
+                    Pufferspeicher
+                </text>
+
+
+                <text
+                    x="1350"
+                    y="300"
+                    class="schema-title"
+                >
+                    FBH-Gruppe
+                </text>
+
+
+                <text
+                    x="1193"
+                    y="351"
+                    class="schema-label"
+                >
+                    Y47
+                </text>
+
+
+                <text
+                    x="1457"
+                    y="402"
+                    class="schema-label"
+                >
+                    Q2
+                </text>
+
+
+                <text
+                    x="1505"
+                    y="462"
+                    class="schema-label"
+                >
+                    Y1
+                </text>
+
+
+
+                <!-- LEITUNGSBESCHRIFTUNGEN -->
+
+                <text
+                    x="300"
+                    y="326"
+                    class="schema-label"
+                >
+                    WP Heiz-/Kühl-Vorlauf → FBH
+                </text>
+
+
+                <text
+                    x="300"
+                    y="416"
+                    class="schema-label"
+                >
+                    WP Vorlauf Boiler (Ladung)
+                </text>
+
+
+                <text
+                    x="385"
+                    y="570"
+                    class="schema-label"
+                >
+                    Boiler-Rücklauf
+                </text>
+
+
+                <text
+                    x="825"
+                    y="600"
+                    class="schema-label"
+                >
+                    Puffer-Rücklauf
+                </text>
+
+
+                <text
+                    x="315"
+                    y="685"
+                    class="schema-label"
+                >
+                    Gemeinsamer Rücklauf Boiler + Puffer → WP
+                </text>
+
+
+                <text
+                    x="465"
+                    y="124"
+                    class="schema-label"
+                >
+                    Brauchwarmwasser → Haus
+                </text>
+
+
+
+                <!-- TEMPERATUREN WP -->
+
+                <text
+                    x="88"
+                    y="392"
+                    class="schema-label"
+                >
+                    WP Vorlauf
+                </text>
+
+
+                <text
+                    x="88"
+                    y="416"
+                    class="schema-value"
+                >
+                    {{WP_FLOW}}
+                </text>
+
+
+                <text
+                    x="88"
+                    y="468"
+                    class="schema-label"
+                >
+                    WP Rücklauf
+                </text>
+
+
+                <text
+                    x="88"
+                    y="492"
+                    class="schema-value"
+                >
+                    {{WP_RETURN}}
+                </text>
+
+
+
+                <!-- BOILER -->
+
+                <text
+                    x="535"
+                    y="355"
+                    class="schema-label"
+                >
+                    B3 oben
+                </text>
+
+
+                <text
+                    x="535"
+                    y="379"
+                    class="schema-value"
+                >
+                    {{BOILER_TOP}}
+                </text>
+
+
+                <text
+                    x="535"
+                    y="548"
+                    class="schema-label"
+                >
+                    B31 unten
+                </text>
+
+
+                <text
+                    x="535"
+                    y="572"
+                    class="schema-value"
+                >
+                    {{BOILER_BOTTOM}}
+                </text>
+
+
+
+                <!-- PUFFER -->
+
+                <text
+                    x="935"
+                    y="345"
+                    class="schema-label"
+                >
+                    B4 oben
+                </text>
+
+
+                <text
+                    x="935"
+                    y="369"
+                    class="schema-value"
+                >
+                    {{BUFFER_TOP}}
+                </text>
+
+
+                <text
+                    x="935"
+                    y="455"
+                    class="schema-label"
+                >
+                    B4.1 mitte
+                </text>
+
+
+                <text
+                    x="935"
+                    y="479"
+                    class="schema-value"
+                >
+                    {{BUFFER_MIDDLE}}
+                </text>
+
+
+                <text
+                    x="935"
+                    y="545"
+                    class="schema-label"
+                >
+                    B41 unten
+                </text>
+
+
+                <text
+                    x="935"
+                    y="569"
+                    class="schema-value"
+                >
+                    {{BUFFER_BOTTOM}}
+                </text>
+
+
+
+                <!-- FBH -->
+
+                <text
+                    x="1335"
+                    y="535"
+                    class="schema-label"
+                >
+                    B1
+                </text>
+
+
+                <text
+                    x="1335"
+                    y="559"
+                    class="schema-value"
+                >
+                    {{FBH_FLOW}}
+                </text>
+
+
+            </svg>
+
+        </div>
+
+    </div>
 
 </div>
-
-
-</div>
-
 
 </body>
 
