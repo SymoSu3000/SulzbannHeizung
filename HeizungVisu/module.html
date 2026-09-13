@@ -35,6 +35,11 @@
 
     --detail-text: #ffffff;
     --detail-muted: #b8c7cf;
+
+    --red: #ff3f4d;
+    --blue: #1685d1;
+    --purple: #a54be0;
+    --green: #25bc7b;
 }
 
 
@@ -128,10 +133,6 @@ body {
         5px;
 }
 
-
-/* ============================================================
-   STATUSZEILE
-============================================================ */
 
 .compact-top {
 
@@ -257,10 +258,6 @@ body {
 }
 
 
-/* ============================================================
-   COMPACT GRAFIK
-============================================================ */
-
 .compact-schema-wrap {
 
     position: relative;
@@ -296,10 +293,6 @@ body {
     margin-bottom: -4px;
 }
 
-
-/* ============================================================
-   COMPACT KOMPONENTEN
-============================================================ */
 
 .compact-component-box {
 
@@ -389,10 +382,6 @@ body {
 }
 
 
-/* ============================================================
-   HEIZSTÄBE
-============================================================ */
-
 .compact-heater {
 
     fill:
@@ -455,32 +444,14 @@ body {
 }
 
 
-.detail-layout {
-
-    width: 100%;
-    height: 100%;
-
-    display: grid;
-
-    grid-template-columns:
-        minmax(900px, 1fr)
-        275px;
-
-    gap: 12px;
-
-    padding: 10px;
-}
-
-
 .schema-wrap {
-
-    min-width: 0;
-    min-height: 0;
 
     width: 100%;
     height: 100%;
 
     overflow: hidden;
+
+    padding: 8px;
 }
 
 
@@ -572,6 +543,14 @@ body {
 }
 
 
+.schema-small {
+
+    font-size: 12px;
+
+    fill: var(--detail-muted);
+}
+
+
 .schema-value {
 
     font-size: 18px;
@@ -579,133 +558,100 @@ body {
 }
 
 
-.mode-value {
+.schema-value-small {
 
-    font-size: 20px;
-    font-weight: 800;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+
+.pipe {
+
+    fill: none;
+
+    stroke-linecap: round;
+    stroke-linejoin: round;
+
+    vector-effect: non-scaling-stroke;
+}
+
+
+.pipe-red {
+
+    stroke: var(--red);
+
+    stroke-width: 6;
+}
+
+
+.pipe-blue {
+
+    stroke: var(--blue);
+
+    stroke-width: 6;
+}
+
+
+.pipe-purple {
+
+    stroke: var(--purple);
+
+    stroke-width: 5;
+}
+
+
+.pipe-green {
+
+    stroke: var(--green);
+
+    stroke-width: 4;
 }
 
 
 /* ============================================================
-   DIAGNOSEBLOCK
+   HEIZSTÄBE DETAIL
 ============================================================ */
 
-.wp-diagnostics {
+.svg-heater {
 
-    min-width: 0;
+    fill:
+        rgba(255, 201, 40, 0.04);
 
-    height: 100%;
+    stroke: #777162;
 
-    padding: 16px;
+    stroke-width: 2;
 
-    border: 1px solid #294554;
-
-    border-radius: 14px;
-
-    background: #0d2431;
-
-    overflow: auto;
+    vector-effect: non-scaling-stroke;
 }
 
 
-.wp-diagnostics h2 {
+.svg-heater.active {
 
-    margin:
-        0
-        0
-        15px
-        0;
+    fill:
+        rgba(255, 201, 40, 0.16);
 
-    font-size: 18px;
+    stroke: var(--yellow);
+
+    filter:
+        drop-shadow(
+            0 0 6px
+            rgba(255, 201, 40, 0.7)
+        );
 }
 
 
-.diag-section {
+.svg-heater-letter {
 
-    margin-bottom: 18px;
-}
+    fill: #8c8778;
 
-
-.diag-section-title {
-
-    margin-bottom: 7px;
-
-    font-size: 12px;
-    font-weight: 700;
-
-    text-transform: uppercase;
-
-    letter-spacing: 0.6px;
-
-    color: #8ea9b7;
-}
-
-
-.diag-row {
-
-    display: flex;
-
-    justify-content: space-between;
-
-    gap: 12px;
-
-    margin-bottom: 7px;
-
-    font-size: 13px;
-}
-
-
-.diag-label {
-
-    color: #a9bdc7;
-}
-
-
-.diag-value {
-
-    text-align: right;
-
-    font-weight: 700;
-
-    color: #ffffff;
-
-    white-space: nowrap;
-}
-
-
-.mode-box {
-
-    margin-bottom: 18px;
-
-    padding: 12px;
-
-    border:
-        1px solid
-        rgba(255,255,255,0.15);
-
-    border-radius: 10px;
-
-    background:
-        rgba(255,255,255,0.04);
-}
-
-
-.mode-title {
-
-    margin-bottom: 4px;
-
-    font-size: 12px;
-
-    color: #9eb4bf;
-}
-
-
-.mode-main {
-
-    font-size: 22px;
+    font-size: 16px;
     font-weight: 800;
+}
 
-    color: {{WP_MODE_COLOR}};
+
+.svg-heater-letter.active {
+
+    fill: var(--yellow);
 }
 
 
@@ -799,12 +745,6 @@ body {
     .compact-graphic-state {
 
         font-size: 22px;
-    }
-
-
-    .compact-heater-letter {
-
-        font-size: 20px;
     }
 }
 
@@ -904,7 +844,7 @@ body {
             </defs>
 
 
-            <!-- WÄRMEPUMPE -->
+            <!-- WP -->
 
             <rect
                 class="compact-component-box"
@@ -1226,24 +1166,22 @@ body {
 <div class="detail">
 
 
-<div class="detail-layout">
-
-
-<!-- ============================================================
-     HYDRAULIKSCHEMA
-============================================================ -->
-
 <div class="schema-wrap">
 
 
 <svg
     class="schema"
+
     xmlns="http://www.w3.org/2000/svg"
+
     viewBox="0 0 1600 745"
+
+    preserveAspectRatio="xMidYMid meet"
 >
 
 
 <defs>
+
 
     <linearGradient
         id="detailTankGradient"
@@ -1270,10 +1208,14 @@ body {
 
     </linearGradient>
 
+
 </defs>
 
 
-<!-- HINTERGRUND -->
+
+<!-- ============================================================
+     HINTERGRUND
+============================================================ -->
 
 <rect
     class="schema-bg"
@@ -1294,7 +1236,10 @@ body {
 />
 
 
-<!-- TITEL -->
+
+<!-- ============================================================
+     TITEL / AKTIVER WP-BETRIEB
+============================================================ -->
 
 <text
     x="30"
@@ -1314,10 +1259,8 @@ body {
 </text>
 
 
-<!-- WP BETRIEBSART DIREKT AUS OZW -->
-
 <circle
-    cx="48"
+    cx="49"
     cy="108"
     r="8"
     fill="{{WP_MODE_COLOR}}"
@@ -1325,18 +1268,18 @@ body {
 
 
 <text
-    x="66"
+    x="67"
     y="113"
     class="schema-label"
 >
-    WP Betriebsart
+    Aktiver WP-Betrieb
 </text>
 
 
 <text
-    x="165"
+    x="190"
     y="113"
-    class="mode-value"
+    class="schema-value"
     fill="{{WP_MODE_COLOR}}"
 >
     {{WP_MODE}}
@@ -1346,8 +1289,8 @@ body {
 <!-- AUSSEN -->
 
 <text
-    x="1465"
-    y="110"
+    x="1460"
+    y="107"
     text-anchor="end"
     class="schema-label"
 >
@@ -1357,7 +1300,7 @@ body {
 
 <text
     x="1555"
-    y="110"
+    y="107"
     text-anchor="end"
     class="schema-value"
 >
@@ -1365,7 +1308,10 @@ body {
 </text>
 
 
-<!-- GERÄTE -->
+
+<!-- ============================================================
+     GERÄTE
+============================================================ -->
 
 <rect
     class="component-surface"
@@ -1407,283 +1353,328 @@ body {
 />
 
 
+
+<!-- ============================================================
+     ROHRGEOMETRIE
+     BESTÄTIGTEN STAND NICHT FREI VERÄNDERN
+============================================================ -->
+
+
 <!-- WP VORLAUF -->
 
 <line
+    class="pipe pipe-red"
     x1="280"
     y1="355"
     x2="390"
     y2="355"
-    stroke="#ff3f4d"
-    stroke-width="6"
 />
 
 <line
+    class="pipe pipe-red"
     x1="390"
     y1="355"
     x2="390"
     y2="185"
-    stroke="#ff3f4d"
-    stroke-width="6"
 />
 
 <line
+    class="pipe pipe-red"
     x1="390"
     y1="185"
     x2="1275"
     y2="185"
-    stroke="#ff3f4d"
-    stroke-width="6"
 />
 
 <line
+    class="pipe pipe-red"
     x1="1275"
     y1="185"
     x2="1275"
     y2="340"
-    stroke="#ff3f4d"
-    stroke-width="6"
 />
 
 
 <!-- BOILER LADUNG -->
 
 <line
+    class="pipe pipe-purple"
     x1="280"
     y1="440"
     x2="430"
     y2="440"
-    stroke="#a54be0"
-    stroke-width="5"
 />
 
 <line
+    class="pipe pipe-purple"
     x1="430"
     y1="440"
     x2="500"
     y2="440"
-    stroke="#a54be0"
-    stroke-width="5"
 />
 
 
 <!-- Y47 -->
 
 <line
+    class="pipe pipe-red"
     x1="1240"
     y1="400"
     x2="1275"
     y2="400"
-    stroke="#ff3f4d"
-    stroke-width="6"
 />
 
 <line
+    class="pipe pipe-red"
     x1="1275"
     y1="400"
     x2="1275"
     y2="340"
-    stroke="#ff3f4d"
-    stroke-width="6"
 />
 
 <line
+    class="pipe pipe-red"
     x1="1210"
     y1="430"
     x2="1210"
     y2="495"
-    stroke="#ff3f4d"
-    stroke-width="6"
 />
 
 <line
+    class="pipe pipe-red"
     x1="1210"
     y1="495"
     x2="1140"
     y2="495"
-    stroke="#ff3f4d"
-    stroke-width="6"
 />
 
 <line
+    class="pipe pipe-red"
     x1="1139.21232291538"
     y1="301.6333373995567"
     x2="1210"
     y2="301.6333373995567"
-    stroke="#ff3f4d"
-    stroke-width="6"
 />
 
 <line
+    class="pipe pipe-red"
     x1="1210"
     y1="301.6333373995567"
     x2="1210"
     y2="370"
-    stroke="#ff3f4d"
-    stroke-width="6"
 />
 
 
 <!-- BOILER RÜCKLAUF -->
 
 <line
+    class="pipe pipe-blue"
     x1="500"
     y1="583.2493995393183"
     x2="430"
     y2="583.2493995393183"
-    stroke="#1685d1"
-    stroke-width="6"
 />
 
 <line
+    class="pipe pipe-blue"
     x1="430"
     y1="583.2493995393183"
     x2="430"
     y2="655"
-    stroke="#1685d1"
-    stroke-width="6"
 />
 
 
 <!-- PUFFER RÜCKLAUF -->
 
 <line
+    class="pipe pipe-blue"
     x1="899.3574614075499"
     y1="577.9910805886045"
     x2="820"
     y2="577.9910805886045"
-    stroke="#1685d1"
-    stroke-width="6"
 />
 
 <line
+    class="pipe pipe-blue"
     x1="820"
     y1="577.9910805886045"
     x2="820"
     y2="655"
-    stroke="#1685d1"
-    stroke-width="6"
 />
 
 
 <!-- GEMEINSAMER RÜCKLAUF -->
 
 <line
+    class="pipe pipe-blue"
     x1="820"
     y1="655"
     x2="430"
     y2="655"
-    stroke="#1685d1"
-    stroke-width="6"
 />
 
 <line
+    class="pipe pipe-blue"
     x1="430"
     y1="655"
     x2="300"
     y2="655"
-    stroke="#1685d1"
-    stroke-width="6"
 />
 
 <line
+    class="pipe pipe-blue"
     x1="300"
     y1="655"
     x2="300"
     y2="500"
-    stroke="#1685d1"
-    stroke-width="6"
 />
 
 <line
+    class="pipe pipe-blue"
     x1="300"
     y1="500"
     x2="280"
     y2="500"
-    stroke="#1685d1"
-    stroke-width="6"
 />
 
 
-<!-- FBH RÜCKLAUF -->
+<!-- ============================================================
+     FBH RÜCKLAUF -> ZUERST PUFFER
+============================================================ -->
 
 <line
+    class="pipe pipe-blue"
     x1="1440.238633066829"
     y1="458.4011352427218"
     x2="1389.088442201554"
     y2="458.4011352427218"
-    stroke="#1685d1"
-    stroke-width="6"
 />
 
 <line
+    class="pipe pipe-blue"
     x1="1389.088442201554"
     y1="699.2034057281654"
     x2="1389.088442201554"
     y2="89.76514523249011"
-    stroke="#1685d1"
-    stroke-width="6"
 />
 
 <line
+    class="pipe pipe-blue"
     x1="1192.274819288892"
     y1="699.2034057281654"
     x2="1389.088442201554"
     y2="699.2034057281654"
-    stroke="#1685d1"
-    stroke-width="6"
 />
 
 <line
+    class="pipe pipe-blue"
     x1="1192.274819288892"
     y1="581.0739501197281"
     x2="1192.274819288892"
     y2="699.2034057281654"
-    stroke="#1685d1"
-    stroke-width="6"
 />
 
 <line
+    class="pipe pipe-blue"
     x1="1140.497400100281"
     y1="581.0739501197281"
     x2="1192.274819288892"
     y2="581.0739501197281"
-    stroke="#1685d1"
-    stroke-width="6"
 />
 
 
-<!-- FBH VORLAUF -->
+<!-- ============================================================
+     FBH VORLAUF
+============================================================ -->
 
 <line
+    class="pipe pipe-red"
     x1="1275"
     y1="400"
     x2="1275"
     y2="668.2469487074558"
-    stroke="#ff3f4d"
-    stroke-width="6"
 />
 
 <line
+    class="pipe pipe-red"
     x1="1275"
     y1="668.2469487074558"
     x2="1468.238633066829"
     y2="668.2469487074558"
-    stroke="#ff3f4d"
-    stroke-width="6"
 />
 
 <line
+    class="pipe pipe-red"
     x1="1468.238633066829"
     y1="668.2469487074558"
     x2="1468.238633066829"
     y2="486.4011352427218"
-    stroke="#ff3f4d"
-    stroke-width="6"
+/>
+
+<line
+    class="pipe pipe-red"
+    x1="1468.238633066829"
+    y1="430.4011352427218"
+    x2="1468.238633066829"
+    y2="424.4011352427218"
 />
 
 
-<!-- ARMATUREN -->
+<!-- ============================================================
+     FBH OBEN
+     WIEDERHERGESTELLTE LEITUNGEN
+============================================================ -->
+
+<line
+    class="pipe pipe-blue"
+    x1="1389.088442201554"
+    y1="89.76514523249011"
+    x2="1404.63755297549"
+    y2="89.76514523249011"
+/>
+
+<line
+    class="pipe pipe-red"
+    x1="1454.63755297549"
+    y1="89.76514523249011"
+    x2="1468.238633066829"
+    y2="89.76514523249011"
+/>
+
+<line
+    class="pipe pipe-red"
+    x1="1468.238633066829"
+    y1="368.4011352427218"
+    x2="1468.238633066829"
+    y2="89.76514523249011"
+/>
+
+
+<!-- ============================================================
+     BRAUCHWARMWASSER
+============================================================ -->
+
+<line
+    class="pipe pipe-green"
+    x1="499.4214030047069"
+    y1="294.87992877019906"
+    x2="449.3033927935944"
+    y2="294.87992877019906"
+/>
+
+<line
+    class="pipe pipe-green"
+    x1="449.3033927935944"
+    y1="294.87992877019906"
+    x2="449.3033927935944"
+    y2="109.82881414455301"
+/>
+
+
+
+<!-- ============================================================
+     Y47
+============================================================ -->
 
 <polygon
     points="
@@ -1698,6 +1689,11 @@ body {
 />
 
 
+
+<!-- ============================================================
+     Q2
+============================================================ -->
+
 <circle
     cx="1468.238633066829"
     cy="396.4011352427218"
@@ -1707,6 +1703,11 @@ body {
     stroke-width="4"
 />
 
+
+
+<!-- ============================================================
+     Y1
+============================================================ -->
 
 <polygon
     points="
@@ -1721,11 +1722,14 @@ body {
 />
 
 
-<!-- TITEL / BEZEICHNUNGEN -->
+
+<!-- ============================================================
+     WP BESCHRIFTUNG UND LIVEWERTE
+============================================================ -->
 
 <text
     x="82"
-    y="330"
+    y="325"
     class="schema-title"
 >
     Wärmepumpe
@@ -1734,12 +1738,168 @@ body {
 
 <text
     x="82"
-    y="353"
-    class="schema-label"
+    y="348"
+    class="schema-small"
 >
     ELCO AEROTOP S09.2
 </text>
 
+
+<text
+    x="82"
+    y="384"
+    class="schema-label"
+>
+    Vorlauf
+</text>
+
+<text
+    x="250"
+    y="384"
+    text-anchor="end"
+    class="schema-value"
+>
+    {{WP_FLOW}}
+</text>
+
+
+<text
+    x="82"
+    y="416"
+    class="schema-label"
+>
+    Rücklauf
+</text>
+
+<text
+    x="250"
+    y="416"
+    text-anchor="end"
+    class="schema-value"
+>
+    {{WP_RETURN}}
+</text>
+
+
+<circle
+    cx="88"
+    cy="448"
+    r="6"
+    fill="{{COMPRESSOR_COLOR}}"
+/>
+
+<text
+    x="103"
+    y="453"
+    class="schema-label"
+>
+    Verdichter
+</text>
+
+<text
+    x="250"
+    y="453"
+    text-anchor="end"
+    class="schema-value-small"
+>
+    {{COMPRESSOR_STATE}}
+</text>
+
+
+<text
+    x="82"
+    y="481"
+    class="schema-small"
+>
+    Modulation
+</text>
+
+<text
+    x="250"
+    y="481"
+    text-anchor="end"
+    class="schema-value-small"
+>
+    {{WP_MODULATION}}
+</text>
+
+
+<text
+    x="82"
+    y="505"
+    class="schema-small"
+>
+    Elektrisch
+</text>
+
+<text
+    x="250"
+    y="505"
+    text-anchor="end"
+    class="schema-value-small"
+>
+    {{WP_ELECTRICAL_POWER}}
+</text>
+
+
+<text
+    x="82"
+    y="529"
+    class="schema-small"
+>
+    Wärme
+</text>
+
+<text
+    x="250"
+    y="529"
+    text-anchor="end"
+    class="schema-value-small"
+>
+    {{WP_HEAT_OUTPUT}}
+</text>
+
+
+<text
+    x="82"
+    y="553"
+    class="schema-small"
+>
+    COP
+</text>
+
+<text
+    x="145"
+    y="553"
+    text-anchor="end"
+    class="schema-value-small"
+>
+    {{WP_COP}}
+</text>
+
+
+<text
+    x="159"
+    y="553"
+    class="schema-small"
+>
+    Durchfluss
+</text>
+
+<text
+    x="250"
+    y="553"
+    text-anchor="end"
+    class="schema-value-small"
+>
+    {{WP_FLOW_RATE}}
+</text>
+
+
+
+<!-- ============================================================
+     BOILER
+============================================================ -->
 
 <text
     x="515"
@@ -1751,112 +1911,14 @@ body {
 
 
 <text
-    x="585"
-    y="324"
-    class="schema-label"
+    x="620"
+    y="325"
+    text-anchor="middle"
+    class="schema-small"
 >
     Boiler
 </text>
 
-
-<text
-    x="920"
-    y="303"
-    class="schema-title"
->
-    Pufferspeicher
-</text>
-
-
-<text
-    x="1350"
-    y="300"
-    class="schema-title"
->
-    FBH-Gruppe
-</text>
-
-
-<text
-    x="1193"
-    y="351"
-    class="schema-label"
->
-    Y47
-</text>
-
-
-<!-- Q2 MIT LIVE STATUS -->
-
-<text
-    x="1454"
-    y="402"
-    text-anchor="middle"
-    class="schema-label"
->
-    Q2
-</text>
-
-
-<text
-    x="1454"
-    y="425"
-    text-anchor="middle"
-    class="schema-value"
-    fill="{{Q2_COLOR}}"
->
-    {{Q2_STATE}}
-</text>
-
-
-<text
-    x="1505"
-    y="462"
-    class="schema-label"
->
-    Y1
-</text>
-
-
-<!-- WP TEMPERATUREN -->
-
-<text
-    x="88"
-    y="392"
-    class="schema-label"
->
-    WP Vorlauf
-</text>
-
-
-<text
-    x="88"
-    y="416"
-    class="schema-value"
->
-    {{WP_FLOW}}
-</text>
-
-
-<text
-    x="88"
-    y="468"
-    class="schema-label"
->
-    WP Rücklauf
-</text>
-
-
-<text
-    x="88"
-    y="492"
-    class="schema-value"
->
-    {{WP_RETURN}}
-</text>
-
-
-<!-- BOILER -->
 
 <text
     x="535"
@@ -1865,7 +1927,6 @@ body {
 >
     B3 oben
 </text>
-
 
 <text
     x="535"
@@ -1884,7 +1945,6 @@ body {
     B31 unten
 </text>
 
-
 <text
     x="535"
     y="572"
@@ -1894,7 +1954,50 @@ body {
 </text>
 
 
-<!-- PUFFER -->
+
+<!-- BOILER ELEKTROHEIZEINSATZ -->
+
+<rect
+    class="svg-heater {{BOILER_HEATER_CLASS}}"
+    x="741"
+    y="514"
+    width="30"
+    height="30"
+    rx="3"
+/>
+
+<text
+    class="svg-heater-letter {{BOILER_HEATER_CLASS}}"
+    x="756"
+    y="535"
+    text-anchor="middle"
+>
+    E
+</text>
+
+<text
+    x="756"
+    y="559"
+    text-anchor="middle"
+    class="schema-small"
+>
+    {{BOILER_HEATER_STATE}}
+</text>
+
+
+
+<!-- ============================================================
+     PUFFER
+============================================================ -->
+
+<text
+    x="920"
+    y="303"
+    class="schema-title"
+>
+    Pufferspeicher
+</text>
+
 
 <text
     x="935"
@@ -1903,7 +2006,6 @@ body {
 >
     B4 oben
 </text>
-
 
 <text
     x="935"
@@ -1922,7 +2024,6 @@ body {
     B4.1 mitte
 </text>
 
-
 <text
     x="935"
     y="479"
@@ -1940,7 +2041,6 @@ body {
     B41 unten
 </text>
 
-
 <text
     x="935"
     y="569"
@@ -1950,173 +2050,164 @@ body {
 </text>
 
 
+
+<!-- PUFFER ELEKTROHEIZEINSATZ -->
+
+<rect
+    class="svg-heater {{BUFFER_HEATER_CLASS}}"
+    x="870"
+    y="382"
+    width="30"
+    height="30"
+    rx="3"
+/>
+
+<text
+    class="svg-heater-letter {{BUFFER_HEATER_CLASS}}"
+    x="885"
+    y="403"
+    text-anchor="middle"
+>
+    E
+</text>
+
+<text
+    x="885"
+    y="427"
+    text-anchor="middle"
+    class="schema-small"
+>
+    {{BUFFER_HEATER_STATE}}
+</text>
+
+
+
+<!-- ============================================================
+     FBH / Q2 / B1
+============================================================ -->
+
+<text
+    x="1350"
+    y="300"
+    class="schema-title"
+>
+    FBH-Gruppe
+</text>
+
+
+<!-- Q2 -->
+
+<text
+    x="1430"
+    y="387"
+    text-anchor="end"
+    class="schema-small"
+>
+    Q2
+</text>
+
+<text
+    x="1430"
+    y="407"
+    text-anchor="end"
+    class="schema-value-small"
+    fill="{{Q2_COLOR}}"
+>
+    {{Q2_STATE}}
+</text>
+
+
+<!-- Y1 -->
+
+<text
+    x="1505"
+    y="462"
+    class="schema-label"
+>
+    Y1
+</text>
+
+
 <!-- B1 -->
 
 <text
-    x="1335"
+    x="1325"
     y="535"
     class="schema-label"
 >
     B1 Vorlauf FBH
 </text>
 
-
 <text
-    x="1335"
-    y="559"
+    x="1325"
+    y="560"
     class="schema-value"
 >
     {{FBH_FLOW}}
 </text>
 
 
-</svg>
-
-
-</div>
-
-
 
 <!-- ============================================================
-     WP DIAGNOSE
+     INTERNE WP-PUMPEN
+     DIREKT BEI DER WP ANGEORDNET
 ============================================================ -->
 
-<div class="wp-diagnostics">
+<text
+    x="315"
+    y="530"
+    class="schema-small"
+>
+    Kondensatorpumpe
+</text>
+
+<text
+    x="445"
+    y="530"
+    text-anchor="end"
+    class="schema-value-small"
+>
+    {{CONDENSER_PUMP}} · {{CONDENSER_PUMP_SPEED}}
+</text>
 
 
-    <h2>
-        WP Diagnose
-    </h2>
+<text
+    x="315"
+    y="556"
+    class="schema-small"
+>
+    Quellenpumpe
+</text>
+
+<text
+    x="445"
+    y="556"
+    text-anchor="end"
+    class="schema-value-small"
+>
+    {{SOURCE_PUMP}} · {{SOURCE_PUMP_SPEED}}
+</text>
 
 
-    <div class="mode-box">
+<text
+    x="315"
+    y="582"
+    class="schema-small"
+>
+    Quellendurchfluss
+</text>
 
-        <div class="mode-title">
-            Betriebsart direkt aus OZW
-        </div>
-
-        <div class="mode-main">
-            {{WP_MODE}}
-        </div>
-
-    </div>
-
-
-    <div class="diag-section">
-
-        <div class="diag-section-title">
-            Wärmepumpe
-        </div>
+<text
+    x="445"
+    y="582"
+    text-anchor="end"
+    class="schema-value-small"
+>
+    {{SOURCE_FLOW}}
+</text>
 
 
-        <div class="diag-row">
-            <span class="diag-label">Verdichter</span>
-            <span class="diag-value">{{COMPRESSOR_STATE}}</span>
-        </div>
-
-
-        <div class="diag-row">
-            <span class="diag-label">Modulation</span>
-            <span class="diag-value">{{WP_MODULATION}}</span>
-        </div>
-
-
-        <div class="diag-row">
-            <span class="diag-label">WP Durchfluss</span>
-            <span class="diag-value">{{WP_FLOW_RATE}}</span>
-        </div>
-
-    </div>
-
-
-    <div class="diag-section">
-
-        <div class="diag-section-title">
-            Leistung
-        </div>
-
-
-        <div class="diag-row">
-            <span class="diag-label">Elektrisch</span>
-            <span class="diag-value">{{WP_ELECTRICAL_POWER}}</span>
-        </div>
-
-
-        <div class="diag-row">
-            <span class="diag-label">Wärmeabgabe</span>
-            <span class="diag-value">{{WP_HEAT_OUTPUT}}</span>
-        </div>
-
-
-        <div class="diag-row">
-            <span class="diag-label">COP</span>
-            <span class="diag-value">{{WP_COP}}</span>
-        </div>
-
-    </div>
-
-
-    <div class="diag-section">
-
-        <div class="diag-section-title">
-            Hydraulik
-        </div>
-
-
-        <div class="diag-row">
-            <span class="diag-label">Q2 Heizkreispumpe</span>
-            <span class="diag-value">{{Q2_STATE}}</span>
-        </div>
-
-
-        <div class="diag-row">
-            <span class="diag-label">B1 Vorlauf</span>
-            <span class="diag-value">{{FBH_FLOW}}</span>
-        </div>
-
-    </div>
-
-
-    <div class="diag-section">
-
-        <div class="diag-section-title">
-            WP Pumpen
-        </div>
-
-
-        <div class="diag-row">
-            <span class="diag-label">Kondensatorpumpe</span>
-            <span class="diag-value">{{CONDENSER_PUMP}}</span>
-        </div>
-
-
-        <div class="diag-row">
-            <span class="diag-label">Drehzahl</span>
-            <span class="diag-value">{{CONDENSER_PUMP_SPEED}}</span>
-        </div>
-
-
-        <div class="diag-row">
-            <span class="diag-label">Quellenpumpe</span>
-            <span class="diag-value">{{SOURCE_PUMP}}</span>
-        </div>
-
-
-        <div class="diag-row">
-            <span class="diag-label">Drehzahl Quelle</span>
-            <span class="diag-value">{{SOURCE_PUMP_SPEED}}</span>
-        </div>
-
-
-        <div class="diag-row">
-            <span class="diag-label">Quellendurchfluss</span>
-            <span class="diag-value">{{SOURCE_FLOW}}</span>
-        </div>
-
-    </div>
-
-
-</div>
+</svg>
 
 
 </div>
