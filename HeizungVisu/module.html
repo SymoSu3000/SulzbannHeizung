@@ -1,1517 +1,2337 @@
-<?php
+<!DOCTYPE html>
 
-declare(strict_types=1);
+<html lang="de">
 
-class SulzbannHeizungVisualisierung extends IPSModule
-{
-    public function Create(): void
-    {
-        parent::Create();
+<head>
 
-        /*
-         * ============================================================
-         * GRUNDWERTE
-         * ============================================================
-         */
+<meta charset="UTF-8">
 
-        $this->RegisterPropertyInteger(
-            'OutsideTempID',
-            50237
-        );
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
 
-        $this->RegisterPropertyInteger(
-            'WPFlowID',
-            27923
-        );
+<style>
 
-        $this->RegisterPropertyInteger(
-            'WPReturnID',
-            45419
-        );
+/* ============================================================
+   THEME
+============================================================ */
 
-        $this->RegisterPropertyInteger(
-            'BoilerTopID',
-            39112
-        );
+:root {
 
-        $this->RegisterPropertyInteger(
-            'BoilerBottomID',
-            40096
-        );
+    --text: #17191c;
+    --muted: #56616a;
 
-        $this->RegisterPropertyInteger(
-            'BufferTopID',
-            27553
-        );
+    --border: rgba(80, 105, 118, 0.42);
+    --borderStrong: rgba(65, 93, 108, 0.70);
 
-        $this->RegisterPropertyInteger(
-            'BufferMiddleID',
-            52270
-        );
+    --yellow: #c38e00;
+    --inactive: #78909c;
 
-        $this->RegisterPropertyInteger(
-            'BufferBottomID',
-            18594
-        );
+    --wp-fill: rgba(211, 221, 226, 0.90);
 
-
-        /*
-         * ============================================================
-         * HYDRAULIK
-         * ============================================================
-         */
-
-        $this->RegisterPropertyInteger(
-            'FBHFlowID',
-            58972
-        );
-
-        $this->RegisterPropertyInteger(
-            'Q2ID',
-            56962
-        );
-
-
-        /*
-         * ============================================================
-         * DIREKTE OZW-BETRIEBSMELDUNGEN
-         * ============================================================
-         */
-
-        $this->RegisterPropertyInteger(
-            'WPHeatingID',
-            44357
-        );
-
-        $this->RegisterPropertyInteger(
-            'WPCoolingID',
-            17689
-        );
-
-        $this->RegisterPropertyInteger(
-            'WPDHWID',
-            21617
-        );
-
-
-        /*
-         * ============================================================
-         * WP DIAGNOSE
-         * ============================================================
-         */
-
-        $this->RegisterPropertyInteger(
-            'WPCompressor1ID',
-            29853
-        );
-
-        $this->RegisterPropertyInteger(
-            'WPCompressor2ID',
-            56852
-        );
-
-        $this->RegisterPropertyInteger(
-            'WPModulationID',
-            20837
-        );
-
-        $this->RegisterPropertyInteger(
-            'WPFlowRateID',
-            16705
-        );
-
-        $this->RegisterPropertyInteger(
-            'WPElectricalPowerID',
-            50450
-        );
-
-        $this->RegisterPropertyInteger(
-            'WPHeatOutputID',
-            32403
-        );
-
-        $this->RegisterPropertyInteger(
-            'WPCOPID',
-            37700
-        );
-
-        $this->RegisterPropertyInteger(
-            'CondenserPumpID',
-            50837
-        );
-
-        $this->RegisterPropertyInteger(
-            'CondenserPumpSpeedID',
-            32715
-        );
-
-        $this->RegisterPropertyInteger(
-            'SourcePumpID',
-            11178
-        );
-
-        $this->RegisterPropertyInteger(
-            'SourcePumpSpeedID',
-            17723
-        );
-
-        $this->RegisterPropertyInteger(
-            'SourceFlowID',
-            41957
-        );
-
-
-        /*
-         * ============================================================
-         * KOMPAKT-VISU
-         * ============================================================
-         */
-
-        $this->RegisterPropertyInteger(
-            'WPStatusID',
-            16864
-        );
-
-
-        /*
-         * ============================================================
-         * ELEKTROHEIZEINSÄTZE
-         * ============================================================
-         */
-
-        $this->RegisterPropertyInteger(
-            'BoilerHeaterID',
-            10737
-        );
-
-        $this->RegisterPropertyInteger(
-            'BufferHeaterID',
-            53546
-        );
-
-
-        /*
-         * ============================================================
-         * UPDATE
-         * ============================================================
-         */
-
-        $this->RegisterPropertyInteger(
-            'RenderDelay',
-            800
-        );
-
-
-        /*
-         * ============================================================
-         * HTMLBOX
-         * ============================================================
-         */
-
-        $this->RegisterVariableString(
-            'HTML',
-            'Heizung Visualisierung',
-            '~HTMLBox',
-            10
-        );
-
-
-        $this->RegisterTimer(
-            'RenderTimer',
-            0,
-            'SBHV_Update($_IPS["TARGET"]);'
-        );
-    }
-
-
-    public function ApplyChanges(): void
-    {
-        parent::ApplyChanges();
-
-
-        foreach (
-            $this->GetObservedVariableIDs()
-            as $variableID
-        ) {
-
-            if (
-                $variableID > 0
-                &&
-                IPS_VariableExists(
-                    $variableID
-                )
-            ) {
-
-                $this->RegisterMessage(
-                    $variableID,
-                    VM_UPDATE
-                );
-            }
-        }
-
-
-        $this->SetTimerInterval(
-            'RenderTimer',
-            0
-        );
-
-
-        $this->Update();
-    }
-
-
-    public function Update(): void
-    {
-        $this->SetTimerInterval(
-            'RenderTimer',
-            0
-        );
-
-
-        $html =
-            $this->BuildVisualization();
-
-
-        $variableID =
-            $this->GetIDForIdent(
-                'HTML'
-            );
-
-
-        $current =
-            GetValueString(
-                $variableID
-            );
-
-
-        if ($current !== $html) {
-
-            SetValueString(
-                $variableID,
-                $html
-            );
-        }
-
-
-        $this->SetStatus(
-            102
-        );
-    }
-
-
-    public function MessageSink(
-        $TimeStamp,
-        $SenderID,
-        $Message,
-        $Data
-    ): void {
-
-        parent::MessageSink(
-            $TimeStamp,
-            $SenderID,
-            $Message,
-            $Data
-        );
-
-
-        if ($Message !== VM_UPDATE) {
-
-            return;
-        }
-
-
-        $delay =
-            max(
-                250,
-                $this->ReadPropertyInteger(
-                    'RenderDelay'
-                )
-            );
-
-
-        $this->SetTimerInterval(
-            'RenderTimer',
-            $delay
-        );
-    }
+    --tank-top: #d9a7aa;
+    --tank-mid: #b9c4d0;
+    --tank-bottom: #8ebee0;
 
 
     /*
-     * ============================================================
-     * PROPERTY-ID MIT FALLBACK
-     * ============================================================
+     * GROSSANSICHT HELL
      */
 
-    private function PropertyID(
-        string $name,
-        int $fallback = 0
-    ): int {
+    --detail-bg: #f4f6f7;
+    --detail-panel: #ffffff;
 
-        $id =
-            $this->ReadPropertyInteger(
-                $name
-            );
+    --detail-text: #17191c;
+    --detail-muted: #58666f;
 
+    --detail-border: #78909c;
+    --detail-border-soft: #b5c1c7;
 
-        if ($id <= 0) {
+    --detail-device: #ffffff;
 
-            return $fallback;
-        }
+    --detail-tank-top: #d9a7aa;
+    --detail-tank-mid: #b9c4d0;
+    --detail-tank-bottom: #8ebee0;
 
+    --red: #e33d4a;
+    --blue: #1685d1;
+    --purple: #8d47bf;
+    --green: #25a96e;
+}
 
-        return $id;
-    }
 
+@media (prefers-color-scheme: dark) {
 
-    /*
-     * ============================================================
-     * BEOBACHTETE VARIABLEN
-     * ============================================================
-     */
+    :root {
 
-    private function GetObservedVariableIDs(): array
-    {
-        return [
+        --text: #f2f7fa;
+        --muted: #a8bdc9;
 
-            $this->PropertyID(
-                'OutsideTempID',
-                50237
-            ),
+        --border: rgba(102, 142, 162, 0.38);
+        --borderStrong: rgba(150, 188, 207, 0.72);
 
-            $this->PropertyID(
-                'WPFlowID',
-                27923
-            ),
+        --yellow: #ffc928;
+        --inactive: #667d89;
 
-            $this->PropertyID(
-                'WPReturnID',
-                45419
-            ),
+        --wp-fill: rgba(15, 43, 56, 0.88);
 
-            $this->PropertyID(
-                'BoilerTopID',
-                39112
-            ),
-
-            $this->PropertyID(
-                'BoilerBottomID',
-                40096
-            ),
-
-            $this->PropertyID(
-                'BufferTopID',
-                27553
-            ),
-
-            $this->PropertyID(
-                'BufferMiddleID',
-                52270
-            ),
-
-            $this->PropertyID(
-                'BufferBottomID',
-                18594
-            ),
-
-            $this->PropertyID(
-                'FBHFlowID',
-                58972
-            ),
-
-            $this->PropertyID(
-                'Q2ID',
-                56962
-            ),
-
-            $this->PropertyID(
-                'WPHeatingID',
-                44357
-            ),
-
-            $this->PropertyID(
-                'WPCoolingID',
-                17689
-            ),
-
-            $this->PropertyID(
-                'WPDHWID',
-                21617
-            ),
-
-            $this->PropertyID(
-                'WPCompressor1ID',
-                29853
-            ),
-
-            $this->PropertyID(
-                'WPCompressor2ID',
-                56852
-            ),
-
-            $this->PropertyID(
-                'WPModulationID',
-                20837
-            ),
-
-            $this->PropertyID(
-                'WPFlowRateID',
-                16705
-            ),
-
-            $this->PropertyID(
-                'WPElectricalPowerID',
-                50450
-            ),
-
-            $this->PropertyID(
-                'WPHeatOutputID',
-                32403
-            ),
-
-            $this->PropertyID(
-                'WPCOPID',
-                37700
-            ),
-
-            $this->PropertyID(
-                'CondenserPumpID',
-                50837
-            ),
-
-            $this->PropertyID(
-                'CondenserPumpSpeedID',
-                32715
-            ),
-
-            $this->PropertyID(
-                'SourcePumpID',
-                11178
-            ),
-
-            $this->PropertyID(
-                'SourcePumpSpeedID',
-                17723
-            ),
-
-            $this->PropertyID(
-                'SourceFlowID',
-                41957
-            ),
-
-            $this->PropertyID(
-                'WPStatusID',
-                16864
-            ),
-
-            $this->PropertyID(
-                'BoilerHeaterID',
-                10737
-            ),
-
-            $this->PropertyID(
-                'BufferHeaterID',
-                53546
-            )
-
-        ];
-    }
-
-
-    /*
-     * ============================================================
-     * LESEN
-     * ============================================================
-     */
-
-    private function ReadValueSafe(
-        int $variableID,
-        mixed $default = null
-    ): mixed {
-
-        if (
-            $variableID <= 0
-            ||
-            !IPS_VariableExists(
-                $variableID
-            )
-        ) {
-
-            return $default;
-        }
-
-
-        try {
-
-            return GetValue(
-                $variableID
-            );
-
-        } catch (Throwable $e) {
-
-            return $default;
-        }
-    }
-
-
-    private function ReadFloat(
-        int $variableID
-    ): ?float {
-
-        $value =
-            $this->ReadValueSafe(
-                $variableID,
-                null
-            );
-
-
-        if (
-            $value === null
-            ||
-            !is_numeric(
-                $value
-            )
-        ) {
-
-            return null;
-        }
-
-
-        return
-            (float) $value;
-    }
-
-
-    private function ReadInteger(
-        int $variableID
-    ): ?int {
-
-        $value =
-            $this->ReadValueSafe(
-                $variableID,
-                null
-            );
-
-
-        if (
-            $value === null
-            ||
-            !is_numeric(
-                $value
-            )
-        ) {
-
-            return null;
-        }
-
-
-        return
-            (int) $value;
-    }
-
-
-    private function ReadBool(
-        int $variableID
-    ): bool {
-
-        $value =
-            $this->ReadValueSafe(
-                $variableID,
-                false
-            );
-
-
-        if (is_bool($value)) {
-
-            return $value;
-        }
-
-
-        if (is_numeric($value)) {
-
-            return
-                ((float) $value)
-                !==
-                0.0;
-        }
-
-
-        return false;
-    }
-
-
-    /*
-     * ============================================================
-     * FORMATIERUNG
-     * ============================================================
-     */
-
-    private function FormatTemperature(
-        ?float $value
-    ): string {
-
-        if ($value === null) {
-
-            return '—';
-        }
-
-
-        return
-            number_format(
-                $value,
-                1,
-                '.',
-                ''
-            )
-            .
-            ' °C';
-    }
-
-
-    private function FormatPower(
-        ?float $value
-    ): string {
-
-        if ($value === null) {
-
-            return '—';
-        }
-
-
-        return
-            number_format(
-                $value,
-                2,
-                '.',
-                ''
-            )
-            .
-            ' kW';
-    }
-
-
-    private function FormatFlow(
-        ?float $value
-    ): string {
-
-        if ($value === null) {
-
-            return '—';
-        }
-
-
-        return
-            number_format(
-                $value,
-                1,
-                '.',
-                ''
-            )
-            .
-            ' l/min';
-    }
-
-
-    private function FormatPercent(
-        ?int $value
-    ): string {
-
-        if ($value === null) {
-
-            return '—';
-        }
-
-
-        return
-            $value
-            .
-            ' %';
-    }
-
-
-    private function FormatCOP(
-        ?float $value
-    ): string {
-
-        if ($value === null) {
-
-            return '—';
-        }
-
-
-        return
-            number_format(
-                $value,
-                2,
-                '.',
-                ''
-            );
-    }
-
-
-    private function H(
-        string $value
-    ): string {
-
-        return htmlspecialchars(
-            $value,
-            ENT_QUOTES |
-            ENT_SUBSTITUTE,
-            'UTF-8'
-        );
-    }
-
-
-    /*
-     * ============================================================
-     * TEMPLATE
-     * ============================================================
-     */
-
-    private function LoadTemplate(): string
-    {
-        $file =
-            __DIR__
-            .
-            '/module.html';
-
-
-        if (!is_file($file)) {
-
-            return
-                '<div style="padding:20px;color:red;">'
-                .
-                'module.html fehlt'
-                .
-                '</div>';
-        }
-
-
-        $html =
-            file_get_contents(
-                $file
-            );
-
-
-        if ($html === false) {
-
-            return
-                '<div style="padding:20px;color:red;">'
-                .
-                'module.html konnte nicht geladen werden'
-                .
-                '</div>';
-        }
-
-
-        return $html;
-    }
-
-
-    /*
-     * ============================================================
-     * AKTIVER WP-BETRIEB DIREKT AUS OZW
-     * ============================================================
-     */
-
-    private function DetermineWPMode(
-        bool $heating,
-        bool $cooling,
-        bool $dhw
-    ): array {
-
-        if ($dhw) {
-
-            return [
-                'text'  => 'Warmwasser',
-                'color' => '#d69b00'
-            ];
-        }
-
-
-        if ($cooling) {
-
-            return [
-                'text'  => 'Kühlen',
-                'color' => '#1685d1'
-            ];
-        }
-
-
-        if ($heating) {
-
-            return [
-                'text'  => 'Heizen',
-                'color' => '#e13946'
-            ];
-        }
-
-
-        return [
-            'text'  => 'Standby',
-            'color' => '#78909c'
-        ];
-    }
-
-
-    /*
-     * ============================================================
-     * BUILD
-     * ============================================================
-     */
-
-    private function BuildVisualization(): string
-    {
-        $template =
-            $this->LoadTemplate();
+        --tank-top: #873743;
+        --tank-mid: #424e70;
+        --tank-bottom: #145ba2;
 
 
         /*
-         * Temperaturen
+         * GROSSANSICHT DUNKEL
          */
 
-        $outside =
-            $this->FormatTemperature(
-                $this->ReadFloat(
-                    $this->PropertyID(
-                        'OutsideTempID',
-                        50237
-                    )
-                )
-            );
+        --detail-bg: #071721;
+        --detail-panel: #102838;
 
+        --detail-text: #ffffff;
+        --detail-muted: #b8c7cf;
 
-        $wpFlow =
-            $this->FormatTemperature(
-                $this->ReadFloat(
-                    $this->PropertyID(
-                        'WPFlowID',
-                        27923
-                    )
-                )
-            );
+        --detail-border: #7293a5;
+        --detail-border-soft: #294554;
 
+        --detail-device: #102838;
 
-        $wpReturn =
-            $this->FormatTemperature(
-                $this->ReadFloat(
-                    $this->PropertyID(
-                        'WPReturnID',
-                        45419
-                    )
-                )
-            );
+        --detail-tank-top: #9a4b56;
+        --detail-tank-mid: #515d7a;
+        --detail-tank-bottom: #236c9d;
 
-
-        $boilerTop =
-            $this->FormatTemperature(
-                $this->ReadFloat(
-                    $this->PropertyID(
-                        'BoilerTopID',
-                        39112
-                    )
-                )
-            );
-
-
-        $boilerBottom =
-            $this->FormatTemperature(
-                $this->ReadFloat(
-                    $this->PropertyID(
-                        'BoilerBottomID',
-                        40096
-                    )
-                )
-            );
-
-
-        $bufferTop =
-            $this->FormatTemperature(
-                $this->ReadFloat(
-                    $this->PropertyID(
-                        'BufferTopID',
-                        27553
-                    )
-                )
-            );
-
-
-        $bufferMiddle =
-            $this->FormatTemperature(
-                $this->ReadFloat(
-                    $this->PropertyID(
-                        'BufferMiddleID',
-                        52270
-                    )
-                )
-            );
-
-
-        $bufferBottom =
-            $this->FormatTemperature(
-                $this->ReadFloat(
-                    $this->PropertyID(
-                        'BufferBottomID',
-                        18594
-                    )
-                )
-            );
-
-
-        $fbhFlow =
-            $this->FormatTemperature(
-                $this->ReadFloat(
-                    $this->PropertyID(
-                        'FBHFlowID',
-                        58972
-                    )
-                )
-            );
-
-
-        /*
-         * Kompakt-WP Status
-         */
-
-        $wpActive =
-            $this->ReadBool(
-                $this->PropertyID(
-                    'WPStatusID',
-                    16864
-                )
-            );
-
-
-        $wpStateCompact =
-            $wpActive
-                ?
-                'Ein'
-                :
-                'Aus';
-
-
-        $wpStateGraphic =
-            $wpActive
-                ?
-                'Verdichter Ein'
-                :
-                'Verdichter Aus';
-
-
-        $wpActiveClass =
-            $wpActive
-                ?
-                'active'
-                :
-                '';
-
-
-        /*
-         * Direkter OZW-Betrieb
-         */
-
-        $heating =
-            $this->ReadBool(
-                $this->PropertyID(
-                    'WPHeatingID',
-                    44357
-                )
-            );
-
-
-        $cooling =
-            $this->ReadBool(
-                $this->PropertyID(
-                    'WPCoolingID',
-                    17689
-                )
-            );
-
-
-        $dhw =
-            $this->ReadBool(
-                $this->PropertyID(
-                    'WPDHWID',
-                    21617
-                )
-            );
-
-
-        $wpMode =
-            $this->DetermineWPMode(
-                $heating,
-                $cooling,
-                $dhw
-            );
-
-
-        /*
-         * Q2
-         */
-
-        $q2Active =
-            $this->ReadBool(
-                $this->PropertyID(
-                    'Q2ID',
-                    56962
-                )
-            );
-
-
-        $q2Text =
-            $q2Active
-                ?
-                'Ein'
-                :
-                'Aus';
-
-
-        $q2Color =
-            $q2Active
-                ?
-                '#25b879'
-                :
-                '#78909c';
-
-
-        /*
-         * Verdichter
-         */
-
-        $compressor1 =
-            $this->ReadBool(
-                $this->PropertyID(
-                    'WPCompressor1ID',
-                    29853
-                )
-            );
-
-
-        $compressor2 =
-            $this->ReadBool(
-                $this->PropertyID(
-                    'WPCompressor2ID',
-                    56852
-                )
-            );
-
-
-        $compressorActive =
-            $compressor1
-            ||
-            $compressor2;
-
-
-        $compressorText =
-            $compressorActive
-                ?
-                'Ein'
-                :
-                'Aus';
-
-
-        $compressorColor =
-            $compressorActive
-                ?
-                '#25b879'
-                :
-                '#78909c';
-
-
-        /*
-         * Diagnose
-         */
-
-        $modulation =
-            $this->FormatPercent(
-                $this->ReadInteger(
-                    $this->PropertyID(
-                        'WPModulationID',
-                        20837
-                    )
-                )
-            );
-
-
-        $flowRate =
-            $this->FormatFlow(
-                $this->ReadFloat(
-                    $this->PropertyID(
-                        'WPFlowRateID',
-                        16705
-                    )
-                )
-            );
-
-
-        $electricalPower =
-            $this->FormatPower(
-                $this->ReadFloat(
-                    $this->PropertyID(
-                        'WPElectricalPowerID',
-                        50450
-                    )
-                )
-            );
-
-
-        $heatOutput =
-            $this->FormatPower(
-                $this->ReadFloat(
-                    $this->PropertyID(
-                        'WPHeatOutputID',
-                        32403
-                    )
-                )
-            );
-
-
-        $cop =
-            $this->FormatCOP(
-                $this->ReadFloat(
-                    $this->PropertyID(
-                        'WPCOPID',
-                        37700
-                    )
-                )
-            );
-
-
-        /*
-         * Kondensatorpumpe
-         */
-
-        $condenserPump =
-            $this->ReadBool(
-                $this->PropertyID(
-                    'CondenserPumpID',
-                    50837
-                )
-            );
-
-
-        $condenserPumpText =
-            $condenserPump
-                ?
-                'Ein'
-                :
-                'Aus';
-
-
-        $condenserPumpSpeed =
-            $this->FormatPercent(
-                $this->ReadInteger(
-                    $this->PropertyID(
-                        'CondenserPumpSpeedID',
-                        32715
-                    )
-                )
-            );
-
-
-        /*
-         * Quellenpumpe
-         */
-
-        $sourcePump =
-            $this->ReadBool(
-                $this->PropertyID(
-                    'SourcePumpID',
-                    11178
-                )
-            );
-
-
-        $sourcePumpText =
-            $sourcePump
-                ?
-                'Ein'
-                :
-                'Aus';
-
-
-        $sourcePumpSpeed =
-            $this->FormatPercent(
-                $this->ReadInteger(
-                    $this->PropertyID(
-                        'SourcePumpSpeedID',
-                        17723
-                    )
-                )
-            );
-
-
-        $sourceFlow =
-            $this->FormatFlow(
-                $this->ReadFloat(
-                    $this->PropertyID(
-                        'SourceFlowID',
-                        41957
-                    )
-                )
-            );
-
-
-        /*
-         * Heizstäbe
-         */
-
-        $boilerHeater =
-            $this->ReadBool(
-                $this->PropertyID(
-                    'BoilerHeaterID',
-                    10737
-                )
-            );
-
-
-        $bufferHeater =
-            $this->ReadBool(
-                $this->PropertyID(
-                    'BufferHeaterID',
-                    53546
-                )
-            );
-
-
-        $boilerHeaterClass =
-            $boilerHeater
-                ?
-                'active'
-                :
-                '';
-
-
-        $bufferHeaterClass =
-            $bufferHeater
-                ?
-                'active'
-                :
-                '';
-
-
-        $boilerHeaterText =
-            $boilerHeater
-                ?
-                'Ein'
-                :
-                'Aus';
-
-
-        $bufferHeaterText =
-            $bufferHeater
-                ?
-                'Ein'
-                :
-                'Aus';
-
-
-        /*
-         * ============================================================
-         * FBH VENTILE
-         * ============================================================
-         *
-         * Die Raum-/Ventil-IDs sind noch nicht belastbar
-         * EG/OG zugeordnet.
-         *
-         * Darum aktuell bewusst keine erfundenen Werte.
-         */
-
-        $egValves =
-            '— / — offen';
-
-        $ogValves =
-            '— / — offen';
-
-        $egDemand =
-            '—';
-
-        $ogDemand =
-            '—';
-
-
-        /*
-         * ============================================================
-         * PLACEHOLDER
-         * ============================================================
-         */
-
-        $replace = [
-
-            '{{OUTSIDE}}' =>
-                $this->H(
-                    $outside
-                ),
-
-            '{{WP_FLOW}}' =>
-                $this->H(
-                    $wpFlow
-                ),
-
-            '{{WP_RETURN}}' =>
-                $this->H(
-                    $wpReturn
-                ),
-
-            '{{BOILER_TOP}}' =>
-                $this->H(
-                    $boilerTop
-                ),
-
-            '{{BOILER_BOTTOM}}' =>
-                $this->H(
-                    $boilerBottom
-                ),
-
-            '{{BUFFER_TOP}}' =>
-                $this->H(
-                    $bufferTop
-                ),
-
-            '{{BUFFER_MIDDLE}}' =>
-                $this->H(
-                    $bufferMiddle
-                ),
-
-            '{{BUFFER_BOTTOM}}' =>
-                $this->H(
-                    $bufferBottom
-                ),
-
-            '{{FBH_FLOW}}' =>
-                $this->H(
-                    $fbhFlow
-                ),
-
-            '{{WP_STATE_COMPACT}}' =>
-                $this->H(
-                    $wpStateCompact
-                ),
-
-            '{{WP_STATE_GRAPHIC}}' =>
-                $this->H(
-                    $wpStateGraphic
-                ),
-
-            '{{WP_ACTIVE_CLASS}}' =>
-                $wpActiveClass,
-
-            '{{WP_MODE}}' =>
-                $this->H(
-                    $wpMode['text']
-                ),
-
-            '{{WP_MODE_COLOR}}' =>
-                $wpMode['color'],
-
-            '{{Q2_STATE}}' =>
-                $this->H(
-                    $q2Text
-                ),
-
-            '{{Q2_COLOR}}' =>
-                $q2Color,
-
-            '{{COMPRESSOR_STATE}}' =>
-                $this->H(
-                    $compressorText
-                ),
-
-            '{{COMPRESSOR_COLOR}}' =>
-                $compressorColor,
-
-            '{{WP_MODULATION}}' =>
-                $this->H(
-                    $modulation
-                ),
-
-            '{{WP_FLOW_RATE}}' =>
-                $this->H(
-                    $flowRate
-                ),
-
-            '{{WP_ELECTRICAL_POWER}}' =>
-                $this->H(
-                    $electricalPower
-                ),
-
-            '{{WP_HEAT_OUTPUT}}' =>
-                $this->H(
-                    $heatOutput
-                ),
-
-            '{{WP_COP}}' =>
-                $this->H(
-                    $cop
-                ),
-
-            '{{CONDENSER_PUMP}}' =>
-                $this->H(
-                    $condenserPumpText
-                ),
-
-            '{{CONDENSER_PUMP_SPEED}}' =>
-                $this->H(
-                    $condenserPumpSpeed
-                ),
-
-            '{{SOURCE_PUMP}}' =>
-                $this->H(
-                    $sourcePumpText
-                ),
-
-            '{{SOURCE_PUMP_SPEED}}' =>
-                $this->H(
-                    $sourcePumpSpeed
-                ),
-
-            '{{SOURCE_FLOW}}' =>
-                $this->H(
-                    $sourceFlow
-                ),
-
-            '{{BOILER_HEATER_CLASS}}' =>
-                $boilerHeaterClass,
-
-            '{{BUFFER_HEATER_CLASS}}' =>
-                $bufferHeaterClass,
-
-            '{{BOILER_HEATER_STATE}}' =>
-                $this->H(
-                    $boilerHeaterText
-                ),
-
-            '{{BUFFER_HEATER_STATE}}' =>
-                $this->H(
-                    $bufferHeaterText
-                ),
-
-            '{{EG_VALVES}}' =>
-                $this->H(
-                    $egValves
-                ),
-
-            '{{OG_VALVES}}' =>
-                $this->H(
-                    $ogValves
-                ),
-
-            '{{EG_DEMAND}}' =>
-                $this->H(
-                    $egDemand
-                ),
-
-            '{{OG_DEMAND}}' =>
-                $this->H(
-                    $ogDemand
-                )
-
-        ];
-
-
-        return
-            strtr(
-                $template,
-                $replace
-            );
+        --red: #ff3f4d;
+        --blue: #1685d1;
+        --purple: #a54be0;
+        --green: #25bc7b;
     }
 }
+
+
+/* ============================================================
+   BASIS
+============================================================ */
+
+* {
+    box-sizing: border-box;
+}
+
+
+html,
+body {
+
+    width: 100%;
+    height: 100%;
+
+    margin: 0;
+    padding: 0;
+
+    overflow: hidden;
+
+    background: transparent;
+
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Arial,
+        sans-serif;
+
+    color: var(--text);
+}
+
+
+#app {
+
+    width: 100%;
+    height: 100%;
+
+    overflow: hidden;
+}
+
+
+/* ============================================================
+   KOMPAKTVISU
+============================================================ */
+
+.compact {
+
+    width: 100%;
+    height: 100%;
+
+    margin: 0;
+
+    display: grid;
+
+    grid-template-rows:
+        34px
+        1fr;
+
+    gap: 2px;
+
+    padding:
+        0
+        5px
+        6px
+        5px;
+}
+
+
+.compact-top {
+
+    width: 100%;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 10px;
+
+    min-width: 0;
+
+    padding:
+        0
+        5px;
+}
+
+
+.compact-wp-state {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 7px;
+
+    min-width: 0;
+
+    flex: 1 1 auto;
+}
+
+
+.status-dot {
+
+    width: 10px;
+    height: 10px;
+
+    flex: 0 0 10px;
+
+    border-radius: 50%;
+
+    background: var(--inactive);
+}
+
+
+.status-dot.active {
+
+    background: #25db90;
+
+    box-shadow:
+        0 0 8px
+        rgba(37, 219, 144, 0.65);
+}
+
+
+.compact-state-main {
+
+    font-size: 13px;
+    font-weight: 700;
+
+    line-height: 16px;
+
+    color: var(--text);
+
+    white-space: nowrap;
+}
+
+
+.compact-state-sub {
+
+    margin-left: 3px;
+
+    font-size: 13px;
+    font-weight: 400;
+
+    color: var(--muted);
+}
+
+
+.compact-outside {
+
+    flex: 0 0 auto;
+
+    min-width: 70px;
+
+    text-align: right;
+
+    white-space: nowrap;
+}
+
+
+.compact-outside-label {
+
+    display: block;
+
+    font-size: 13px;
+    line-height: 15px;
+
+    color: var(--muted);
+}
+
+
+.compact-outside-value {
+
+    display: block;
+
+    margin-top: 1px;
+
+    font-size: 15px;
+    line-height: 17px;
+
+    font-weight: 700;
+
+    color: var(--text);
+
+    white-space: nowrap;
+}
+
+
+.compact-schema-wrap {
+
+    position: relative;
+
+    min-width: 0;
+    min-height: 0;
+
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    overflow: hidden;
+}
+
+
+.compact-schema {
+
+    display: block;
+
+    width: calc(100% + 14px);
+    height: calc(100% + 8px);
+
+    max-width: none;
+    max-height: none;
+
+    margin-left: -7px;
+    margin-right: -7px;
+    margin-top: -4px;
+    margin-bottom: -4px;
+}
+
+
+.compact-component-box {
+
+    fill: var(--wp-fill);
+
+    stroke: var(--borderStrong);
+
+    stroke-width: 1.5;
+
+    vector-effect: non-scaling-stroke;
+}
+
+
+.compact-tank {
+
+    fill: url(#compactTankGradient);
+
+    stroke: var(--borderStrong);
+
+    stroke-width: 1.6;
+
+    vector-effect: non-scaling-stroke;
+}
+
+
+.compact-svg-title {
+
+    fill: var(--text);
+
+    font-size: 30px;
+    font-weight: 700;
+}
+
+
+.compact-svg-label {
+
+    fill: var(--muted);
+
+    font-size: 27px;
+    font-weight: 500;
+}
+
+
+.compact-svg-value {
+
+    fill: var(--text);
+
+    font-size: 29px;
+    font-weight: 700;
+}
+
+
+.compact-graphic-state {
+
+    font-size: 24px;
+    font-weight: 500;
+}
+
+
+.compact-wp-circle {
+
+    fill: none;
+
+    stroke: var(--borderStrong);
+
+    stroke-width: 4;
+
+    vector-effect: non-scaling-stroke;
+}
+
+
+.compact-wp-dot {
+
+    fill: var(--inactive);
+}
+
+
+.compact-wp-dot.active {
+
+    fill: #25db90;
+}
+
+
+.compact-heater {
+
+    fill:
+        rgba(255, 201, 40, 0.04);
+
+    stroke: #7d7764;
+
+    stroke-width: 2;
+
+    vector-effect: non-scaling-stroke;
+}
+
+
+.compact-heater.active {
+
+    fill:
+        rgba(255, 201, 40, 0.16);
+
+    stroke: var(--yellow);
+}
+
+
+.compact-heater-letter {
+
+    fill: #716c60;
+
+    font-size: 21px;
+    font-weight: 800;
+}
+
+
+.compact-heater-letter.active {
+
+    fill: var(--yellow);
+}
+
+
+/* ============================================================
+   GROSSANSICHT
+============================================================ */
+
+.detail {
+
+    display: none;
+
+    width: 100%;
+    height: 100%;
+
+    overflow: hidden;
+
+    background: var(--detail-bg);
+
+    color: var(--detail-text);
+}
+
+
+.schema-wrap {
+
+    width: 100%;
+    height: 100%;
+
+    overflow: hidden;
+
+    padding: 8px;
+}
+
+
+.schema {
+
+    display: block;
+
+    width: 100%;
+    height: 100%;
+}
+
+
+.schema text {
+
+    fill: var(--detail-text);
+
+    stroke: none;
+
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Arial,
+        sans-serif;
+}
+
+
+.schema-bg {
+
+    fill: var(--detail-bg);
+}
+
+
+.schema-border {
+
+    fill: none;
+
+    stroke: var(--detail-border-soft);
+
+    stroke-width: 1.5;
+}
+
+
+.component-surface {
+
+    fill: var(--detail-device);
+
+    stroke: var(--detail-border);
+
+    stroke-width: 1.5;
+}
+
+
+.tank-surface {
+
+    fill: url(#detailTankGradient);
+
+    stroke: var(--detail-border);
+
+    stroke-width: 1.5;
+}
+
+
+.schema-title {
+
+    font-size: 20px;
+    font-weight: 700;
+}
+
+
+.schema-main-title {
+
+    font-size: 28px;
+    font-weight: 700;
+}
+
+
+.schema-subtitle {
+
+    font-size: 13px;
+
+    fill: var(--detail-muted);
+}
+
+
+.schema-label {
+
+    font-size: 13px;
+}
+
+
+.schema-small {
+
+    font-size: 12px;
+
+    fill: var(--detail-muted);
+}
+
+
+.schema-value {
+
+    font-size: 18px;
+    font-weight: 700;
+}
+
+
+.schema-value-small {
+
+    font-size: 14px;
+    font-weight: 700;
+}
+
+
+/* ============================================================
+   ZENTRIERTE SVG TEXTE
+============================================================ */
+
+.svg-center {
+
+    text-anchor: middle;
+
+    dominant-baseline: middle;
+}
+
+
+.svg-code {
+
+    font-size: 13px;
+    font-weight: 700;
+}
+
+
+.svg-state {
+
+    font-size: 14px;
+    font-weight: 700;
+}
+
+
+.svg-group-title {
+
+    font-size: 14px;
+    font-weight: 800;
+
+    text-anchor: middle;
+
+    dominant-baseline: middle;
+}
+
+
+.svg-group-info {
+
+    font-size: 12px;
+
+    text-anchor: middle;
+
+    dominant-baseline: middle;
+}
+
+
+.svg-group-value {
+
+    font-size: 13px;
+    font-weight: 700;
+
+    text-anchor: middle;
+
+    dominant-baseline: middle;
+}
+
+
+/* ============================================================
+   ROHRE
+============================================================ */
+
+.pipe {
+
+    fill: none;
+
+    stroke-linecap: round;
+    stroke-linejoin: round;
+
+    vector-effect: non-scaling-stroke;
+}
+
+
+.pipe-red {
+
+    stroke: var(--red);
+
+    stroke-width: 6;
+}
+
+
+.pipe-blue {
+
+    stroke: var(--blue);
+
+    stroke-width: 6;
+}
+
+
+.pipe-purple {
+
+    stroke: var(--purple);
+
+    stroke-width: 5;
+}
+
+
+.pipe-green {
+
+    stroke: var(--green);
+
+    stroke-width: 4;
+}
+
+
+/* ============================================================
+   HEIZSTÄBE
+============================================================ */
+
+.svg-heater {
+
+    fill:
+        rgba(255, 201, 40, 0.04);
+
+    stroke: var(--detail-border);
+
+    stroke-width: 2;
+}
+
+
+.svg-heater.active {
+
+    fill:
+        rgba(255, 201, 40, 0.20);
+
+    stroke: var(--yellow);
+}
+
+
+.svg-heater-letter {
+
+    fill: var(--detail-muted);
+
+    font-size: 16px;
+    font-weight: 800;
+
+    text-anchor: middle;
+
+    dominant-baseline: middle;
+}
+
+
+.svg-heater-letter.active {
+
+    fill: var(--yellow);
+}
+
+
+/* ============================================================
+   KLEIN / GROSS
+============================================================ */
+
+@media (min-height: 520px) {
+
+    body {
+
+        overflow: hidden;
+
+        background: var(--detail-bg);
+    }
+
+
+    .compact {
+
+        display: none;
+    }
+
+
+    .detail {
+
+        display: block;
+    }
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+<div id="app">
+
+
+<!-- ============================================================
+     KOMPAKT
+============================================================ -->
+
+<div class="compact">
+
+
+    <div class="compact-top">
+
+
+        <div class="compact-wp-state">
+
+            <span
+                class="status-dot {{WP_ACTIVE_CLASS}}"
+            ></span>
+
+
+            <div class="compact-state-main">
+
+                WP
+
+                <span class="compact-state-sub">
+                    {{WP_STATE_COMPACT}}
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <div class="compact-outside">
+
+            <div class="compact-outside-label">
+                Aussen
+            </div>
+
+            <div class="compact-outside-value">
+                {{OUTSIDE}}
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+    <div class="compact-schema-wrap">
+
+
+        <svg
+            class="compact-schema"
+            viewBox="0 0 900 335"
+            preserveAspectRatio="xMidYMid meet"
+        >
+
+
+            <defs>
+
+                <linearGradient
+                    id="compactTankGradient"
+                    x1="0"
+                    y1="0"
+                    x2="0"
+                    y2="1"
+                >
+
+                    <stop
+                        offset="0%"
+                        stop-color="var(--tank-top)"
+                    />
+
+                    <stop
+                        offset="50%"
+                        stop-color="var(--tank-mid)"
+                    />
+
+                    <stop
+                        offset="100%"
+                        stop-color="var(--tank-bottom)"
+                    />
+
+                </linearGradient>
+
+            </defs>
+
+
+            <!-- WP -->
+
+            <rect
+                class="compact-component-box"
+                x="15"
+                y="20"
+                width="255"
+                height="285"
+                rx="18"
+            />
+
+
+            <text
+                class="compact-svg-title"
+                x="142"
+                y="55"
+                text-anchor="middle"
+            >
+                Wärmepumpe
+            </text>
+
+
+            <circle
+                class="compact-wp-circle"
+                cx="142"
+                cy="122"
+                r="42"
+            />
+
+
+            <circle
+                class="compact-wp-dot {{WP_ACTIVE_CLASS}}"
+                cx="91"
+                cy="190"
+                r="7"
+            />
+
+
+            <text
+                class="compact-svg-label compact-graphic-state"
+                x="108"
+                y="197"
+            >
+                {{WP_STATE_GRAPHIC}}
+            </text>
+
+
+            <text
+                class="compact-svg-label"
+                x="43"
+                y="240"
+            >
+                Vorlauf
+            </text>
+
+
+            <text
+                class="compact-svg-value"
+                x="245"
+                y="240"
+                text-anchor="end"
+            >
+                {{WP_FLOW}}
+            </text>
+
+
+            <text
+                class="compact-svg-label"
+                x="43"
+                y="281"
+            >
+                Rücklauf
+            </text>
+
+
+            <text
+                class="compact-svg-value"
+                x="245"
+                y="281"
+                text-anchor="end"
+            >
+                {{WP_RETURN}}
+            </text>
+
+
+            <!-- BOILER -->
+
+            <rect
+                class="compact-tank"
+                x="323"
+                y="20"
+                width="250"
+                height="285"
+                rx="18"
+            />
+
+
+            <text
+                class="compact-svg-title"
+                x="448"
+                y="55"
+                text-anchor="middle"
+            >
+                Boiler
+            </text>
+
+
+            <text
+                class="compact-svg-label"
+                x="345"
+                y="101"
+            >
+                oben
+            </text>
+
+
+            <text
+                class="compact-svg-value"
+                x="548"
+                y="101"
+                text-anchor="end"
+            >
+                {{BOILER_TOP}}
+            </text>
+
+
+            <line
+                class="compact-wp-circle"
+                x1="375"
+                y1="133"
+                x2="520"
+                y2="121"
+            />
+
+            <line
+                class="compact-wp-circle"
+                x1="375"
+                y1="150"
+                x2="520"
+                y2="138"
+            />
+
+            <line
+                class="compact-wp-circle"
+                x1="375"
+                y1="167"
+                x2="520"
+                y2="155"
+            />
+
+            <line
+                class="compact-wp-circle"
+                x1="375"
+                y1="184"
+                x2="520"
+                y2="172"
+            />
+
+            <line
+                class="compact-wp-circle"
+                x1="375"
+                y1="201"
+                x2="520"
+                y2="189"
+            />
+
+
+            <text
+                class="compact-svg-label"
+                x="345"
+                y="263"
+            >
+                unten
+            </text>
+
+
+            <text
+                class="compact-svg-value"
+                x="548"
+                y="263"
+                text-anchor="end"
+            >
+                {{BOILER_BOTTOM}}
+            </text>
+
+
+            <rect
+                class="compact-heater {{BOILER_HEATER_CLASS}}"
+                x="520"
+                y="270"
+                width="33"
+                height="28"
+                rx="4"
+            />
+
+
+            <text
+                class="compact-heater-letter {{BOILER_HEATER_CLASS}}"
+                x="536.5"
+                y="291"
+                text-anchor="middle"
+            >
+                E
+            </text>
+
+
+            <!-- PUFFER -->
+
+            <rect
+                class="compact-tank"
+                x="630"
+                y="20"
+                width="250"
+                height="285"
+                rx="18"
+            />
+
+
+            <text
+                class="compact-svg-title"
+                x="755"
+                y="55"
+                text-anchor="middle"
+            >
+                Puffer
+            </text>
+
+
+            <text
+                class="compact-svg-label"
+                x="650"
+                y="101"
+            >
+                oben
+            </text>
+
+
+            <text
+                class="compact-svg-value"
+                x="855"
+                y="101"
+                text-anchor="end"
+            >
+                {{BUFFER_TOP}}
+            </text>
+
+
+            <text
+                class="compact-svg-label"
+                x="650"
+                y="175"
+            >
+                mitte
+            </text>
+
+
+            <text
+                class="compact-svg-value"
+                x="855"
+                y="175"
+                text-anchor="end"
+            >
+                {{BUFFER_MIDDLE}}
+            </text>
+
+
+            <text
+                class="compact-svg-label"
+                x="650"
+                y="253"
+            >
+                unten
+            </text>
+
+
+            <text
+                class="compact-svg-value"
+                x="855"
+                y="253"
+                text-anchor="end"
+            >
+                {{BUFFER_BOTTOM}}
+            </text>
+
+
+            <rect
+                class="compact-heater {{BUFFER_HEATER_CLASS}}"
+                x="646"
+                y="270"
+                width="33"
+                height="28"
+                rx="4"
+            />
+
+
+            <text
+                class="compact-heater-letter {{BUFFER_HEATER_CLASS}}"
+                x="662.5"
+                y="291"
+                text-anchor="middle"
+            >
+                E
+            </text>
+
+
+        </svg>
+
+
+    </div>
+
+
+</div>
+
+
+
+<!-- ============================================================
+     GROSSANSICHT
+============================================================ -->
+
+<div class="detail">
+
+
+<div class="schema-wrap">
+
+
+<svg
+    class="schema"
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 1600 745"
+    preserveAspectRatio="xMidYMid meet"
+>
+
+
+<defs>
+
+
+    <linearGradient
+        id="detailTankGradient"
+        x1="0"
+        y1="0"
+        x2="0"
+        y2="1"
+    >
+
+        <stop
+            offset="0%"
+            stop-color="var(--detail-tank-top)"
+        />
+
+        <stop
+            offset="48%"
+            stop-color="var(--detail-tank-mid)"
+        />
+
+        <stop
+            offset="100%"
+            stop-color="var(--detail-tank-bottom)"
+        />
+
+    </linearGradient>
+
+
+</defs>
+
+
+
+<!-- HINTERGRUND -->
+
+<rect
+    class="schema-bg"
+    x="0"
+    y="0"
+    width="1600"
+    height="745"
+/>
+
+
+<rect
+    class="schema-border"
+    x="14"
+    y="14"
+    width="1572"
+    height="717"
+    rx="18"
+/>
+
+
+
+<!-- TITEL -->
+
+<text
+    x="30"
+    y="45"
+    class="schema-main-title"
+>
+    Wärmepumpe / Hydraulik
+</text>
+
+
+<text
+    x="32"
+    y="70"
+    class="schema-subtitle"
+>
+    ELCO AEROTOP S09.2 · OZW / Siemens
+</text>
+
+
+<circle
+    cx="49"
+    cy="108"
+    r="8"
+    fill="{{WP_MODE_COLOR}}"
+/>
+
+
+<text
+    x="67"
+    y="113"
+    class="schema-label"
+>
+    Aktiver WP-Betrieb
+</text>
+
+
+<text
+    x="190"
+    y="113"
+    class="schema-value"
+    fill="{{WP_MODE_COLOR}}"
+>
+    {{WP_MODE}}
+</text>
+
+
+
+<!-- AUSSEN -->
+
+<text
+    x="1460"
+    y="107"
+    text-anchor="end"
+    class="schema-label"
+>
+    Aussen
+</text>
+
+
+<text
+    x="1555"
+    y="107"
+    text-anchor="end"
+    class="schema-value"
+>
+    {{OUTSIDE}}
+</text>
+
+
+
+<!-- ============================================================
+     KOMPONENTEN
+============================================================ -->
+
+<rect
+    class="component-surface"
+    x="60"
+    y="295"
+    width="220"
+    height="270"
+    rx="18"
+/>
+
+
+<rect
+    class="tank-surface"
+    x="500"
+    y="270"
+    width="240"
+    height="330"
+    rx="18"
+/>
+
+
+<rect
+    class="tank-surface"
+    x="900"
+    y="270"
+    width="240"
+    height="330"
+    rx="18"
+/>
+
+
+<rect
+    class="component-surface"
+    x="1310"
+    y="270"
+    width="220"
+    height="330"
+    rx="18"
+/>
+
+
+
+<!-- ============================================================
+     ROHRGEOMETRIE
+============================================================ -->
+
+<!-- WP VORLAUF -->
+
+<line
+    class="pipe pipe-red"
+    x1="280"
+    y1="355"
+    x2="390"
+    y2="355"
+/>
+
+<line
+    class="pipe pipe-red"
+    x1="390"
+    y1="355"
+    x2="390"
+    y2="185"
+/>
+
+<line
+    class="pipe pipe-red"
+    x1="390"
+    y1="185"
+    x2="1275"
+    y2="185"
+/>
+
+<line
+    class="pipe pipe-red"
+    x1="1275"
+    y1="185"
+    x2="1275"
+    y2="340"
+/>
+
+
+<!-- BOILER -->
+
+<line
+    class="pipe pipe-purple"
+    x1="280"
+    y1="440"
+    x2="430"
+    y2="440"
+/>
+
+<line
+    class="pipe pipe-purple"
+    x1="430"
+    y1="440"
+    x2="500"
+    y2="440"
+/>
+
+
+<!-- Y47 -->
+
+<line
+    class="pipe pipe-red"
+    x1="1240"
+    y1="400"
+    x2="1275"
+    y2="400"
+/>
+
+<line
+    class="pipe pipe-red"
+    x1="1275"
+    y1="400"
+    x2="1275"
+    y2="340"
+/>
+
+<line
+    class="pipe pipe-red"
+    x1="1210"
+    y1="430"
+    x2="1210"
+    y2="495"
+/>
+
+<line
+    class="pipe pipe-red"
+    x1="1210"
+    y1="495"
+    x2="1140"
+    y2="495"
+/>
+
+<line
+    class="pipe pipe-red"
+    x1="1139.21232291538"
+    y1="301.6333373995567"
+    x2="1210"
+    y2="301.6333373995567"
+/>
+
+<line
+    class="pipe pipe-red"
+    x1="1210"
+    y1="301.6333373995567"
+    x2="1210"
+    y2="370"
+/>
+
+
+<!-- BOILER RÜCKLAUF -->
+
+<line
+    class="pipe pipe-blue"
+    x1="500"
+    y1="583.2493995393183"
+    x2="430"
+    y2="583.2493995393183"
+/>
+
+<line
+    class="pipe pipe-blue"
+    x1="430"
+    y1="583.2493995393183"
+    x2="430"
+    y2="655"
+/>
+
+
+<!-- PUFFER RÜCKLAUF -->
+
+<line
+    class="pipe pipe-blue"
+    x1="899.3574614075499"
+    y1="577.9910805886045"
+    x2="820"
+    y2="577.9910805886045"
+/>
+
+<line
+    class="pipe pipe-blue"
+    x1="820"
+    y1="577.9910805886045"
+    x2="820"
+    y2="655"
+/>
+
+
+<!-- GEMEINSAMER RÜCKLAUF -->
+
+<line
+    class="pipe pipe-blue"
+    x1="820"
+    y1="655"
+    x2="430"
+    y2="655"
+/>
+
+<line
+    class="pipe pipe-blue"
+    x1="430"
+    y1="655"
+    x2="300"
+    y2="655"
+/>
+
+<line
+    class="pipe pipe-blue"
+    x1="300"
+    y1="655"
+    x2="300"
+    y2="500"
+/>
+
+<line
+    class="pipe pipe-blue"
+    x1="300"
+    y1="500"
+    x2="280"
+    y2="500"
+/>
+
+
+<!-- FBH RÜCKLAUF -->
+
+<line
+    class="pipe pipe-blue"
+    x1="1440.238633066829"
+    y1="458.4011352427218"
+    x2="1389.088442201554"
+    y2="458.4011352427218"
+/>
+
+<line
+    class="pipe pipe-blue"
+    x1="1389.088442201554"
+    y1="699.2034057281654"
+    x2="1389.088442201554"
+    y2="89.76514523249011"
+/>
+
+<line
+    class="pipe pipe-blue"
+    x1="1192.274819288892"
+    y1="699.2034057281654"
+    x2="1389.088442201554"
+    y2="699.2034057281654"
+/>
+
+<line
+    class="pipe pipe-blue"
+    x1="1192.274819288892"
+    y1="581.0739501197281"
+    x2="1192.274819288892"
+    y2="699.2034057281654"
+/>
+
+<line
+    class="pipe pipe-blue"
+    x1="1140.497400100281"
+    y1="581.0739501197281"
+    x2="1192.274819288892"
+    y2="581.0739501197281"
+/>
+
+
+<!-- FBH VORLAUF -->
+
+<line
+    class="pipe pipe-red"
+    x1="1275"
+    y1="400"
+    x2="1275"
+    y2="668.2469487074558"
+/>
+
+<line
+    class="pipe pipe-red"
+    x1="1275"
+    y1="668.2469487074558"
+    x2="1468.238633066829"
+    y2="668.2469487074558"
+/>
+
+<line
+    class="pipe pipe-red"
+    x1="1468.238633066829"
+    y1="668.2469487074558"
+    x2="1468.238633066829"
+    y2="486.4011352427218"
+/>
+
+<line
+    class="pipe pipe-red"
+    x1="1468.238633066829"
+    y1="430.4011352427218"
+    x2="1468.238633066829"
+    y2="424.4011352427218"
+/>
+
+
+<!-- FBH OBEN -->
+
+<line
+    class="pipe pipe-blue"
+    x1="1389.088442201554"
+    y1="89.76514523249011"
+    x2="1404.63755297549"
+    y2="89.76514523249011"
+/>
+
+<line
+    class="pipe pipe-red"
+    x1="1454.63755297549"
+    y1="89.76514523249011"
+    x2="1468.238633066829"
+    y2="89.76514523249011"
+/>
+
+<line
+    class="pipe pipe-red"
+    x1="1468.238633066829"
+    y1="368.4011352427218"
+    x2="1468.238633066829"
+    y2="89.76514523249011"
+/>
+
+
+<!-- BRAUCHWARMWASSER -->
+
+<line
+    class="pipe pipe-green"
+    x1="499.4214030047069"
+    y1="294.87992877019906"
+    x2="449.3033927935944"
+    y2="294.87992877019906"
+/>
+
+<line
+    class="pipe pipe-green"
+    x1="449.3033927935944"
+    y1="294.87992877019906"
+    x2="449.3033927935944"
+    y2="109.82881414455301"
+/>
+
+
+
+<!-- ============================================================
+     WP
+============================================================ -->
+
+<text
+    x="82"
+    y="325"
+    class="schema-title"
+>
+    Wärmepumpe
+</text>
+
+
+<text
+    x="82"
+    y="348"
+    class="schema-small"
+>
+    ELCO AEROTOP S09.2
+</text>
+
+
+<text
+    x="82"
+    y="384"
+    class="schema-label"
+>
+    Vorlauf
+</text>
+
+<text
+    x="250"
+    y="384"
+    text-anchor="end"
+    class="schema-value"
+>
+    {{WP_FLOW}}
+</text>
+
+
+<text
+    x="82"
+    y="416"
+    class="schema-label"
+>
+    Rücklauf
+</text>
+
+<text
+    x="250"
+    y="416"
+    text-anchor="end"
+    class="schema-value"
+>
+    {{WP_RETURN}}
+</text>
+
+
+<circle
+    cx="88"
+    cy="448"
+    r="6"
+    fill="{{COMPRESSOR_COLOR}}"
+/>
+
+<text
+    x="103"
+    y="453"
+    class="schema-label"
+>
+    Verdichter
+</text>
+
+<text
+    x="250"
+    y="453"
+    text-anchor="end"
+    class="schema-value-small"
+>
+    {{COMPRESSOR_STATE}}
+</text>
+
+
+<text
+    x="82"
+    y="481"
+    class="schema-small"
+>
+    Modulation
+</text>
+
+<text
+    x="250"
+    y="481"
+    text-anchor="end"
+    class="schema-value-small"
+>
+    {{WP_MODULATION}}
+</text>
+
+
+<text
+    x="82"
+    y="506"
+    class="schema-small"
+>
+    Elektrisch
+</text>
+
+<text
+    x="250"
+    y="506"
+    text-anchor="end"
+    class="schema-value-small"
+>
+    {{WP_ELECTRICAL_POWER}}
+</text>
+
+
+<text
+    x="82"
+    y="531"
+    class="schema-small"
+>
+    Wärme
+</text>
+
+<text
+    x="250"
+    y="531"
+    text-anchor="end"
+    class="schema-value-small"
+>
+    {{WP_HEAT_OUTPUT}}
+</text>
+
+
+<text
+    x="82"
+    y="556"
+    class="schema-small"
+>
+    COP / Durchfluss
+</text>
+
+<text
+    x="250"
+    y="556"
+    text-anchor="end"
+    class="schema-value-small"
+>
+    {{WP_COP}} · {{WP_FLOW_RATE}}
+</text>
+
+
+
+<!-- WP PUMPEN UNTERHALB DER WP -->
+
+<g transform="translate(70 590)">
+
+    <text
+        x="0"
+        y="0"
+        class="schema-small"
+    >
+        Kondensatorpumpe
+    </text>
+
+    <text
+        x="205"
+        y="0"
+        text-anchor="end"
+        class="schema-value-small"
+    >
+        {{CONDENSER_PUMP}} · {{CONDENSER_PUMP_SPEED}}
+    </text>
+
+
+    <text
+        x="0"
+        y="24"
+        class="schema-small"
+    >
+        Quellenpumpe
+    </text>
+
+    <text
+        x="205"
+        y="24"
+        text-anchor="end"
+        class="schema-value-small"
+    >
+        {{SOURCE_PUMP}} · {{SOURCE_PUMP_SPEED}}
+    </text>
+
+
+    <text
+        x="0"
+        y="48"
+        class="schema-small"
+    >
+        Quellendurchfluss
+    </text>
+
+    <text
+        x="205"
+        y="48"
+        text-anchor="end"
+        class="schema-value-small"
+    >
+        {{SOURCE_FLOW}}
+    </text>
+
+</g>
+
+
+
+<!-- ============================================================
+     BOILER
+============================================================ -->
+
+<text
+    x="515"
+    y="300"
+    class="schema-title"
+>
+    Brauchwarmwasserspeicher
+</text>
+
+
+<text
+    x="620"
+    y="325"
+    text-anchor="middle"
+    class="schema-small"
+>
+    Boiler
+</text>
+
+
+<text
+    x="535"
+    y="355"
+    class="schema-label"
+>
+    B3 oben
+</text>
+
+<text
+    x="535"
+    y="379"
+    class="schema-value"
+>
+    {{BOILER_TOP}}
+</text>
+
+
+<text
+    x="535"
+    y="548"
+    class="schema-label"
+>
+    B31 unten
+</text>
+
+<text
+    x="535"
+    y="572"
+    class="schema-value"
+>
+    {{BOILER_BOTTOM}}
+</text>
+
+
+<!-- BOILER HEIZSTAB -->
+
+<g transform="translate(756 529)">
+
+    <rect
+        class="svg-heater {{BOILER_HEATER_CLASS}}"
+        x="-15"
+        y="-15"
+        width="30"
+        height="30"
+        rx="3"
+    />
+
+    <text
+        class="svg-heater-letter {{BOILER_HEATER_CLASS}}"
+        x="0"
+        y="1"
+    >
+        E
+    </text>
+
+    <text
+        class="schema-small svg-center"
+        x="0"
+        y="31"
+    >
+        {{BOILER_HEATER_STATE}}
+    </text>
+
+</g>
+
+
+
+<!-- ============================================================
+     PUFFER
+============================================================ -->
+
+<text
+    x="920"
+    y="303"
+    class="schema-title"
+>
+    Pufferspeicher
+</text>
+
+
+<text
+    x="935"
+    y="345"
+    class="schema-label"
+>
+    B4 oben
+</text>
+
+<text
+    x="935"
+    y="369"
+    class="schema-value"
+>
+    {{BUFFER_TOP}}
+</text>
+
+
+<text
+    x="935"
+    y="455"
+    class="schema-label"
+>
+    B4.1 mitte
+</text>
+
+<text
+    x="935"
+    y="479"
+    class="schema-value"
+>
+    {{BUFFER_MIDDLE}}
+</text>
+
+
+<text
+    x="935"
+    y="545"
+    class="schema-label"
+>
+    B41 unten
+</text>
+
+<text
+    x="935"
+    y="569"
+    class="schema-value"
+>
+    {{BUFFER_BOTTOM}}
+</text>
+
+
+<!-- PUFFER HEIZSTAB -->
+
+<g transform="translate(885 397)">
+
+    <rect
+        class="svg-heater {{BUFFER_HEATER_CLASS}}"
+        x="-15"
+        y="-15"
+        width="30"
+        height="30"
+        rx="3"
+    />
+
+    <text
+        class="svg-heater-letter {{BUFFER_HEATER_CLASS}}"
+        x="0"
+        y="1"
+    >
+        E
+    </text>
+
+    <text
+        class="schema-small svg-center"
+        x="0"
+        y="31"
+    >
+        {{BUFFER_HEATER_STATE}}
+    </text>
+
+</g>
+
+
+
+<!-- ============================================================
+     Y47
+============================================================ -->
+
+<g transform="translate(1210 400)">
+
+    <polygon
+        points="
+            0,-30
+            30,0
+            0,30
+            -30,0
+        "
+        fill="var(--detail-device)"
+        stroke="var(--detail-border)"
+        stroke-width="2"
+    />
+
+    <text
+        x="0"
+        y="-42"
+        class="svg-code svg-center"
+    >
+        Y47
+    </text>
+
+</g>
+
+
+
+<!-- ============================================================
+     GRUPPE FBH
+     KREIS WIE IM ORIGINALSCHEMA
+============================================================ -->
+
+<g transform="translate(1430 326)">
+
+    <circle
+        cx="0"
+        cy="0"
+        r="31"
+        fill="var(--detail-device)"
+        stroke="var(--detail-border)"
+        stroke-width="3"
+    />
+
+    <text
+        x="0"
+        y="-7"
+        class="svg-group-title"
+    >
+        GRUPPE
+    </text>
+
+    <text
+        x="0"
+        y="10"
+        class="svg-group-title"
+    >
+        FBH
+    </text>
+
+</g>
+
+
+
+<!-- ============================================================
+     Q2
+     GEMEINSAM ZENTRIERTE BAUGRUPPE
+============================================================ -->
+
+<g transform="translate(1468.238633066829 396.4011352427218)">
+
+    <circle
+        cx="0"
+        cy="0"
+        r="28"
+        fill="var(--detail-device)"
+        stroke="{{Q2_COLOR}}"
+        stroke-width="4"
+    />
+
+    <text
+        x="0"
+        y="-5"
+        class="svg-code svg-center"
+    >
+        Q2
+    </text>
+
+    <text
+        x="0"
+        y="14"
+        class="svg-state svg-center"
+        fill="{{Q2_COLOR}}"
+    >
+        {{Q2_STATE}}
+    </text>
+
+</g>
+
+
+
+<!-- ============================================================
+     Y1
+============================================================ -->
+
+<g transform="translate(1468.238633066829 458.4011352427218)">
+
+    <polygon
+        points="
+            0,-28
+            28,0
+            0,28
+            -28,0
+        "
+        fill="var(--detail-device)"
+        stroke="var(--detail-border)"
+        stroke-width="2"
+    />
+
+    <text
+        x="0"
+        y="0"
+        class="svg-code svg-center"
+    >
+        Y1
+    </text>
+
+</g>
+
+
+
+<!-- ============================================================
+     B1
+============================================================ -->
+
+<g transform="translate(1430 528)">
+
+    <text
+        x="0"
+        y="0"
+        class="svg-group-info"
+    >
+        B1 Vorlauf FBH
+    </text>
+
+    <text
+        x="0"
+        y="25"
+        class="svg-group-value"
+    >
+        {{FBH_FLOW}}
+    </text>
+
+</g>
+
+
+
+<!-- ============================================================
+     FBH VENTILÜBERSICHT
+============================================================ -->
+
+<g transform="translate(1430 584)">
+
+    <text
+        x="0"
+        y="0"
+        class="svg-group-title"
+    >
+        Stellventile
+    </text>
+
+
+    <text
+        x="-72"
+        y="27"
+        class="svg-group-info"
+    >
+        EG
+    </text>
+
+    <text
+        x="18"
+        y="27"
+        class="svg-group-value"
+    >
+        {{EG_VALVES}}
+    </text>
+
+
+    <text
+        x="-72"
+        y="49"
+        class="svg-group-info"
+    >
+        Bedarf
+    </text>
+
+    <text
+        x="18"
+        y="49"
+        class="svg-group-value"
+    >
+        {{EG_DEMAND}}
+    </text>
+
+
+    <text
+        x="-72"
+        y="77"
+        class="svg-group-info"
+    >
+        OG
+    </text>
+
+    <text
+        x="18"
+        y="77"
+        class="svg-group-value"
+    >
+        {{OG_VALVES}}
+    </text>
+
+
+    <text
+        x="-72"
+        y="99"
+        class="svg-group-info"
+    >
+        Bedarf
+    </text>
+
+    <text
+        x="18"
+        y="99"
+        class="svg-group-value"
+    >
+        {{OG_DEMAND}}
+    </text>
+
+</g>
+
+
+</svg>
+
+
+</div>
+
+
+</div>
+
+
+</div>
+
+</body>
+
+</html>
