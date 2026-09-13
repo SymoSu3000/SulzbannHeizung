@@ -16,11 +16,9 @@ class SulzbannHeizungVisualisierung extends IPSModule
 
 
         /*
-         * --------------------------------------------------------
+         * ========================================================
          * DATENPUNKTE
-         * --------------------------------------------------------
-         *
-         * Defaultwerte entsprechen deinem aktuellen System.
+         * ========================================================
          */
 
         $this->RegisterPropertyInteger(
@@ -28,48 +26,40 @@ class SulzbannHeizungVisualisierung extends IPSModule
             50237
         );
 
-
         $this->RegisterPropertyInteger(
             'WPFlowID',
             27923
         );
-
 
         $this->RegisterPropertyInteger(
             'WPReturnID',
             45419
         );
 
-
         $this->RegisterPropertyInteger(
             'BoilerTopID',
             39112
         );
-
 
         $this->RegisterPropertyInteger(
             'BoilerBottomID',
             40096
         );
 
-
         $this->RegisterPropertyInteger(
             'BufferTopID',
             27553
         );
-
 
         $this->RegisterPropertyInteger(
             'BufferMiddleID',
             52270
         );
 
-
         $this->RegisterPropertyInteger(
             'BufferBottomID',
             18594
         );
-
 
         /*
          * B1 noch nicht eindeutig zugeordnet.
@@ -79,34 +69,27 @@ class SulzbannHeizungVisualisierung extends IPSModule
             0
         );
 
-
         $this->RegisterPropertyInteger(
             'WPStatusID',
             16864
         );
 
-
         /*
-         * Flexible Verbraucher aus kleiner Visu.
+         * Flexible Verbraucher.
          */
-
         $this->RegisterPropertyInteger(
             'BoilerHeaterID',
             10737
         );
-
 
         $this->RegisterPropertyInteger(
             'BufferHeaterID',
             53546
         );
 
-
         /*
-         * Mehrere unmittelbar folgende Telegramme
-         * werden zu einem Render-Vorgang zusammengefasst.
+         * Mehrere unmittelbar folgende Telegramme bündeln.
          */
-
         $this->RegisterPropertyInteger(
             'RenderDelay',
             800
@@ -117,8 +100,6 @@ class SulzbannHeizungVisualisierung extends IPSModule
          * ========================================================
          * EINE HTMLBOX
          * ========================================================
-         *
-         * Genau wie bei der funktionierenden Wettervisu.
          */
 
         $this->RegisterVariableString(
@@ -130,9 +111,8 @@ class SulzbannHeizungVisualisierung extends IPSModule
 
 
         /*
-         * Timer standardmässig aus.
+         * Timer standardmässig ausgeschaltet.
          */
-
         $this->RegisterTimer(
             'RenderTimer',
             0,
@@ -151,10 +131,6 @@ class SulzbannHeizungVisualisierung extends IPSModule
     {
         parent::ApplyChanges();
 
-
-        /*
-         * Alle verwendeten Variablen beobachten.
-         */
 
         foreach (
             $this->GetObservedVariableIDs()
@@ -177,19 +153,11 @@ class SulzbannHeizungVisualisierung extends IPSModule
         }
 
 
-        /*
-         * Timer sicher deaktivieren.
-         */
-
         $this->SetTimerInterval(
             'RenderTimer',
             0
         );
 
-
-        /*
-         * Einmal sofort aufbauen.
-         */
 
         $this->Update();
     }
@@ -203,10 +171,6 @@ class SulzbannHeizungVisualisierung extends IPSModule
 
     public function Update(): void
     {
-        /*
-         * Sammel-Timer ausschalten.
-         */
-
         $this->SetTimerInterval(
             'RenderTimer',
             0
@@ -230,11 +194,9 @@ class SulzbannHeizungVisualisierung extends IPSModule
 
 
         /*
-         * Nur schreiben, wenn sich wirklich etwas geändert hat.
-         *
-         * Dadurch keine dauernden unnötigen HTMLBox-Reloads.
+         * Nur schreiben, wenn sich der Inhalt tatsächlich
+         * geändert hat.
          */
-
         if ($current !== $html) {
 
             SetValueString(
@@ -277,10 +239,6 @@ class SulzbannHeizungVisualisierung extends IPSModule
         }
 
 
-        /*
-         * Mehrere Telegramme bündeln.
-         */
-
         $delay =
             max(
                 250,
@@ -290,6 +248,10 @@ class SulzbannHeizungVisualisierung extends IPSModule
             );
 
 
+        /*
+         * Bei jedem weiteren Telegramm beginnt die kurze
+         * Sammelzeit erneut.
+         */
         $this->SetTimerInterval(
             'RenderTimer',
             $delay
@@ -466,7 +428,7 @@ class SulzbannHeizungVisualisierung extends IPSModule
 
     /*
      * ============================================================
-     * TEMPERATUR
+     * TEMPERATUR FORMATIEREN
      * ============================================================
      */
 
@@ -513,7 +475,7 @@ class SulzbannHeizungVisualisierung extends IPSModule
 
     /*
      * ============================================================
-     * TEMPLATE LADEN
+     * TEMPLATE
      * ============================================================
      */
 
@@ -559,7 +521,7 @@ class SulzbannHeizungVisualisierung extends IPSModule
 
     /*
      * ============================================================
-     * VISUALISIERUNG AUFBAUEN
+     * VISUALISIERUNG
      * ============================================================
      */
 
@@ -570,9 +532,9 @@ class SulzbannHeizungVisualisierung extends IPSModule
 
 
         /*
-         * --------------------------------------------------------
-         * WERTE
-         * --------------------------------------------------------
+         * ========================================================
+         * TEMPERATUREN
+         * ========================================================
          */
 
         $outside =
@@ -666,7 +628,9 @@ class SulzbannHeizungVisualisierung extends IPSModule
 
 
         /*
-         * WP Status.
+         * ========================================================
+         * WP STATUS
+         * ========================================================
          */
 
         $wpActive =
@@ -685,7 +649,7 @@ class SulzbannHeizungVisualisierung extends IPSModule
                 'Aus';
 
 
-        $wpStateDetail =
+        $wpStateGraphic =
             $wpActive
                 ?
                 'Verdichter Ein'
@@ -693,16 +657,33 @@ class SulzbannHeizungVisualisierung extends IPSModule
                 'Verdichter Aus';
 
 
-        $wpDotColor =
-            $wpActive
-                ?
-                '#24d68a'
-                :
-                '#78929f';
+        $wpStateDetail =
+            $wpStateGraphic;
 
 
         /*
-         * Heizstäbe.
+         * Originale CSS-Klasse der alten kleinen Visu.
+         */
+        $wpActiveClass =
+            $wpActive
+                ?
+                'active'
+                :
+                '';
+
+
+        $wpDotColor =
+            $wpActive
+                ?
+                '#25db90'
+                :
+                '#78909c';
+
+
+        /*
+         * ========================================================
+         * HEIZSTÄBE
+         * ========================================================
          */
 
         $boilerHeater =
@@ -721,26 +702,26 @@ class SulzbannHeizungVisualisierung extends IPSModule
             );
 
 
-        $boilerHeaterText =
+        $boilerHeaterClass =
             $boilerHeater
                 ?
-                'Ein'
+                'active'
                 :
-                'Aus';
+                '';
 
 
-        $bufferHeaterText =
+        $bufferHeaterClass =
             $bufferHeater
                 ?
-                'Ein'
+                'active'
                 :
-                'Aus';
+                '';
 
 
         /*
-         * --------------------------------------------------------
-         * TEMPLATE-PLATZHALTER
-         * --------------------------------------------------------
+         * ========================================================
+         * PLATZHALTER
+         * ========================================================
          */
 
         $replace = [
@@ -791,19 +772,31 @@ class SulzbannHeizungVisualisierung extends IPSModule
                 ),
 
             '{{WP_STATE_COMPACT}}' =>
-                $wpStateCompact,
+                $this->H(
+                    $wpStateCompact
+                ),
+
+            '{{WP_STATE_GRAPHIC}}' =>
+                $this->H(
+                    $wpStateGraphic
+                ),
 
             '{{WP_STATE_DETAIL}}' =>
-                $wpStateDetail,
+                $this->H(
+                    $wpStateDetail
+                ),
+
+            '{{WP_ACTIVE_CLASS}}' =>
+                $wpActiveClass,
 
             '{{WP_DOT_COLOR}}' =>
                 $wpDotColor,
 
-            '{{BOILER_HEATER}}' =>
-                $boilerHeaterText,
+            '{{BOILER_HEATER_CLASS}}' =>
+                $boilerHeaterClass,
 
-            '{{BUFFER_HEATER}}' =>
-                $bufferHeaterText
+            '{{BUFFER_HEATER_CLASS}}' =>
+                $bufferHeaterClass
 
         ];
 
