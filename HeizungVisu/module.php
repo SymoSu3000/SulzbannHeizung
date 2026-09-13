@@ -61,22 +61,11 @@ class SulzbannHeizungVisualisierung extends IPSModule
          * ============================================================
          */
 
-        /*
-         * B1 Vorlauffühler FBH.
-         *
-         * Bestehende Instanzen können aus früherem Stand noch 0
-         * gespeichert haben. BuildVisualization() verwendet dann
-         * automatisch den bestätigten Wert #58972.
-         */
         $this->RegisterPropertyInteger(
             'FBHFlowID',
             58972
         );
 
-
-        /*
-         * Q2 Mischerkreispumpe / Heizkreispumpe.
-         */
         $this->RegisterPropertyInteger(
             'Q2ID',
             56962
@@ -85,7 +74,7 @@ class SulzbannHeizungVisualisierung extends IPSModule
 
         /*
          * ============================================================
-         * DIREKTE OZW BETRIEBSMELDUNGEN
+         * DIREKTE OZW-BETRIEBSMELDUNGEN
          * ============================================================
          */
 
@@ -146,10 +135,6 @@ class SulzbannHeizungVisualisierung extends IPSModule
             37700
         );
 
-
-        /*
-         * Interne Pumpen der Wärmepumpe.
-         */
         $this->RegisterPropertyInteger(
             'CondenserPumpID',
             50837
@@ -178,7 +163,7 @@ class SulzbannHeizungVisualisierung extends IPSModule
 
         /*
          * ============================================================
-         * KOMPAKT-VISU STATUS
+         * KOMPAKT-VISU
          * ============================================================
          */
 
@@ -190,7 +175,7 @@ class SulzbannHeizungVisualisierung extends IPSModule
 
         /*
          * ============================================================
-         * EXTERNE ELEKTROHEIZEINSÄTZE
+         * ELEKTROHEIZEINSÄTZE
          * ============================================================
          */
 
@@ -534,7 +519,7 @@ class SulzbannHeizungVisualisierung extends IPSModule
 
     /*
      * ============================================================
-     * WERTE LESEN
+     * LESEN
      * ============================================================
      */
 
@@ -838,7 +823,7 @@ class SulzbannHeizungVisualisierung extends IPSModule
 
             return [
                 'text'  => 'Warmwasser',
-                'color' => '#ffc928'
+                'color' => '#d69b00'
             ];
         }
 
@@ -847,7 +832,7 @@ class SulzbannHeizungVisualisierung extends IPSModule
 
             return [
                 'text'  => 'Kühlen',
-                'color' => '#35a9ff'
+                'color' => '#1685d1'
             ];
         }
 
@@ -856,7 +841,7 @@ class SulzbannHeizungVisualisierung extends IPSModule
 
             return [
                 'text'  => 'Heizen',
-                'color' => '#ff5a55'
+                'color' => '#e13946'
             ];
         }
 
@@ -881,7 +866,7 @@ class SulzbannHeizungVisualisierung extends IPSModule
 
 
         /*
-         * Temperaturen.
+         * Temperaturen
          */
 
         $outside =
@@ -972,10 +957,6 @@ class SulzbannHeizungVisualisierung extends IPSModule
             );
 
 
-        /*
-         * B1 mit sicherem Fallback auf #58972.
-         */
-
         $fbhFlow =
             $this->FormatTemperature(
                 $this->ReadFloat(
@@ -988,7 +969,7 @@ class SulzbannHeizungVisualisierung extends IPSModule
 
 
         /*
-         * Kompakt-WP Status.
+         * Kompakt-WP Status
          */
 
         $wpActive =
@@ -1025,7 +1006,7 @@ class SulzbannHeizungVisualisierung extends IPSModule
 
 
         /*
-         * Direkter OZW-Betrieb.
+         * Direkter OZW-Betrieb
          */
 
         $heating =
@@ -1064,7 +1045,7 @@ class SulzbannHeizungVisualisierung extends IPSModule
 
 
         /*
-         * Q2.
+         * Q2
          */
 
         $q2Active =
@@ -1087,13 +1068,13 @@ class SulzbannHeizungVisualisierung extends IPSModule
         $q2Color =
             $q2Active
                 ?
-                '#25db90'
+                '#25b879'
                 :
                 '#78909c';
 
 
         /*
-         * Verdichter.
+         * Verdichter
          */
 
         $compressor1 =
@@ -1114,12 +1095,14 @@ class SulzbannHeizungVisualisierung extends IPSModule
             );
 
 
+        $compressorActive =
+            $compressor1
+            ||
+            $compressor2;
+
+
         $compressorText =
-            (
-                $compressor1
-                ||
-                $compressor2
-            )
+            $compressorActive
                 ?
                 'Ein'
                 :
@@ -1127,19 +1110,15 @@ class SulzbannHeizungVisualisierung extends IPSModule
 
 
         $compressorColor =
-            (
-                $compressor1
-                ||
-                $compressor2
-            )
+            $compressorActive
                 ?
-                '#25db90'
+                '#25b879'
                 :
                 '#78909c';
 
 
         /*
-         * Diagnose.
+         * Diagnose
          */
 
         $modulation =
@@ -1198,7 +1177,7 @@ class SulzbannHeizungVisualisierung extends IPSModule
 
 
         /*
-         * Kondensatorpumpe.
+         * Kondensatorpumpe
          */
 
         $condenserPump =
@@ -1230,7 +1209,7 @@ class SulzbannHeizungVisualisierung extends IPSModule
 
 
         /*
-         * Quellenpumpe.
+         * Quellenpumpe
          */
 
         $sourcePump =
@@ -1273,7 +1252,7 @@ class SulzbannHeizungVisualisierung extends IPSModule
 
 
         /*
-         * Externe Heizstäbe.
+         * Heizstäbe
          */
 
         $boilerHeater =
@@ -1327,7 +1306,33 @@ class SulzbannHeizungVisualisierung extends IPSModule
 
 
         /*
-         * Platzhalter.
+         * ============================================================
+         * FBH VENTILE
+         * ============================================================
+         *
+         * Die Raum-/Ventil-IDs sind noch nicht belastbar
+         * EG/OG zugeordnet.
+         *
+         * Darum aktuell bewusst keine erfundenen Werte.
+         */
+
+        $egValves =
+            '— / — offen';
+
+        $ogValves =
+            '— / — offen';
+
+        $egDemand =
+            '—';
+
+        $ogDemand =
+            '—';
+
+
+        /*
+         * ============================================================
+         * PLACEHOLDER
+         * ============================================================
          */
 
         $replace = [
@@ -1478,6 +1483,26 @@ class SulzbannHeizungVisualisierung extends IPSModule
             '{{BUFFER_HEATER_STATE}}' =>
                 $this->H(
                     $bufferHeaterText
+                ),
+
+            '{{EG_VALVES}}' =>
+                $this->H(
+                    $egValves
+                ),
+
+            '{{OG_VALVES}}' =>
+                $this->H(
+                    $ogValves
+                ),
+
+            '{{EG_DEMAND}}' =>
+                $this->H(
+                    $egDemand
+                ),
+
+            '{{OG_DEMAND}}' =>
+                $this->H(
+                    $ogDemand
                 )
 
         ];
