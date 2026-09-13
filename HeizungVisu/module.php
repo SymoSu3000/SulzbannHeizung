@@ -249,8 +249,8 @@ class SulzbannHeizungVisualisierung extends IPSModule
 
 
         /*
-         * Bei jedem weiteren Telegramm beginnt die kurze
-         * Sammelzeit erneut.
+         * Mehrere unmittelbar folgende Änderungen werden
+         * zusammengefasst.
          */
         $this->SetTimerInterval(
             'RenderTimer',
@@ -661,9 +661,6 @@ class SulzbannHeizungVisualisierung extends IPSModule
             $wpStateGraphic;
 
 
-        /*
-         * Originale CSS-Klasse der alten kleinen Visu.
-         */
         $wpActiveClass =
             $wpActive
                 ?
