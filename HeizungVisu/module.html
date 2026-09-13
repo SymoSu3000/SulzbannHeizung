@@ -33,18 +33,16 @@
     --tank-bottom: #8ebee0;
 
 
-    /* Grossansicht hell */
+    /* DETAIL HELL */
 
     --detail-bg: #f4f6f7;
-    --detail-panel: #ffffff;
+    --detail-device: #ffffff;
 
     --detail-text: #17191c;
     --detail-muted: #58666f;
 
     --detail-border: #78909c;
     --detail-border-soft: #b5c1c7;
-
-    --detail-device: #ffffff;
 
     --detail-tank-top: #d9a7aa;
     --detail-tank-mid: #b9c4d0;
@@ -76,18 +74,16 @@
         --tank-bottom: #145ba2;
 
 
-        /* Grossansicht dunkel */
+        /* DETAIL DUNKEL */
 
         --detail-bg: #071721;
-        --detail-panel: #102838;
+        --detail-device: #102838;
 
         --detail-text: #ffffff;
         --detail-muted: #b8c7cf;
 
         --detail-border: #7293a5;
         --detail-border-soft: #294554;
-
-        --detail-device: #102838;
 
         --detail-tank-top: #9a4b56;
         --detail-tank-mid: #515d7a;
@@ -177,8 +173,6 @@ body {
     align-items: center;
     justify-content: space-between;
 
-    gap: 10px;
-
     padding:
         0
         5px;
@@ -192,8 +186,6 @@ body {
     align-items: center;
 
     gap: 7px;
-
-    flex: 1 1 auto;
 }
 
 
@@ -220,8 +212,6 @@ body {
 
     font-size: 13px;
     font-weight: 700;
-
-    color: var(--text);
 
     white-space: nowrap;
 }
@@ -262,8 +252,6 @@ body {
 
     font-size: 15px;
     font-weight: 700;
-
-    color: var(--text);
 }
 
 
@@ -290,9 +278,6 @@ body {
     width: calc(100% + 14px);
     height: calc(100% + 8px);
 
-    max-width: none;
-    max-height: none;
-
     margin:
         -4px
         -7px;
@@ -306,8 +291,6 @@ body {
     stroke: var(--borderStrong);
 
     stroke-width: 1.5;
-
-    vector-effect: non-scaling-stroke;
 }
 
 
@@ -318,8 +301,6 @@ body {
     stroke: var(--borderStrong);
 
     stroke-width: 1.6;
-
-    vector-effect: non-scaling-stroke;
 }
 
 
@@ -363,8 +344,6 @@ body {
     stroke: var(--borderStrong);
 
     stroke-width: 4;
-
-    vector-effect: non-scaling-stroke;
 }
 
 
@@ -382,8 +361,7 @@ body {
 
 .compact-heater {
 
-    fill:
-        rgba(255, 201, 40, 0.04);
+    fill: rgba(255, 201, 40, 0.04);
 
     stroke: #7d7764;
 
@@ -393,8 +371,7 @@ body {
 
 .compact-heater.active {
 
-    fill:
-        rgba(255, 201, 40, 0.16);
+    fill: rgba(255, 201, 40, 0.16);
 
     stroke: var(--yellow);
 }
@@ -416,7 +393,7 @@ body {
 
 
 /* ============================================================
-   GROSSANSICHT
+   DETAIL
 ============================================================ */
 
 .detail {
@@ -559,6 +536,10 @@ body {
 }
 
 
+/* ============================================================
+   ROHRE
+============================================================ */
+
 .pipe {
 
     fill: none;
@@ -608,8 +589,7 @@ body {
 
 .svg-heater {
 
-    fill:
-        rgba(255, 201, 40, 0.05);
+    fill: rgba(255, 201, 40, 0.05);
 
     stroke: var(--detail-border);
 
@@ -619,8 +599,7 @@ body {
 
 .svg-heater.active {
 
-    fill:
-        rgba(255, 201, 40, 0.22);
+    fill: rgba(255, 201, 40, 0.22);
 
     stroke: var(--yellow);
 }
@@ -680,7 +659,7 @@ body {
 
 
 <!-- ============================================================
-     KOMPAKTVISU
+     KOMPAKTANSICHT
 ============================================================ -->
 
 <div class="compact">
@@ -727,7 +706,9 @@ body {
 
         <svg
             class="compact-schema"
+
             viewBox="0 0 900 335"
+
             preserveAspectRatio="xMidYMid meet"
         >
 
@@ -876,45 +857,11 @@ body {
                 {{BOILER_TOP}}
             </text>
 
-            <line
-                class="compact-wp-circle"
-                x1="375"
-                y1="133"
-                x2="520"
-                y2="121"
-            />
-
-            <line
-                class="compact-wp-circle"
-                x1="375"
-                y1="150"
-                x2="520"
-                y2="138"
-            />
-
-            <line
-                class="compact-wp-circle"
-                x1="375"
-                y1="167"
-                x2="520"
-                y2="155"
-            />
-
-            <line
-                class="compact-wp-circle"
-                x1="375"
-                y1="184"
-                x2="520"
-                y2="172"
-            />
-
-            <line
-                class="compact-wp-circle"
-                x1="375"
-                y1="201"
-                x2="520"
-                y2="189"
-            />
+            <line class="compact-wp-circle" x1="375" y1="133" x2="520" y2="121"/>
+            <line class="compact-wp-circle" x1="375" y1="150" x2="520" y2="138"/>
+            <line class="compact-wp-circle" x1="375" y1="167" x2="520" y2="155"/>
+            <line class="compact-wp-circle" x1="375" y1="184" x2="520" y2="172"/>
+            <line class="compact-wp-circle" x1="375" y1="201" x2="520" y2="189"/>
 
             <text
                 class="compact-svg-label"
@@ -972,11 +919,7 @@ body {
                 Puffer
             </text>
 
-            <text
-                class="compact-svg-label"
-                x="650"
-                y="101"
-            >
+            <text class="compact-svg-label" x="650" y="101">
                 oben
             </text>
 
@@ -989,11 +932,7 @@ body {
                 {{BUFFER_TOP}}
             </text>
 
-            <text
-                class="compact-svg-label"
-                x="650"
-                y="175"
-            >
+            <text class="compact-svg-label" x="650" y="175">
                 mitte
             </text>
 
@@ -1006,11 +945,7 @@ body {
                 {{BUFFER_MIDDLE}}
             </text>
 
-            <text
-                class="compact-svg-label"
-                x="650"
-                y="253"
-            >
+            <text class="compact-svg-label" x="650" y="253">
                 unten
             </text>
 
@@ -1044,9 +979,7 @@ body {
 
         </svg>
 
-
     </div>
-
 
 </div>
 
@@ -1058,9 +991,7 @@ body {
 
 <div class="detail">
 
-
 <div class="schema-wrap">
-
 
 <svg
     class="schema"
@@ -1074,7 +1005,6 @@ body {
 
 
 <defs>
-
 
     <linearGradient
         id="detailTankGradient"
@@ -1101,7 +1031,6 @@ body {
 
     </linearGradient>
 
-
 </defs>
 
 
@@ -1118,7 +1047,6 @@ body {
     height="745"
 />
 
-
 <rect
     class="schema-border"
     x="14"
@@ -1131,7 +1059,7 @@ body {
 
 
 <!-- ============================================================
-     TITEL
+     TITEL / WP-BETRIEB
 ============================================================ -->
 
 <text
@@ -1142,7 +1070,6 @@ body {
     Wärmepumpe / Hydraulik
 </text>
 
-
 <text
     x="32"
     y="70"
@@ -1151,14 +1078,12 @@ body {
     ELCO AEROTOP S09.2 · OZW / Siemens
 </text>
 
-
 <circle
     cx="49"
     cy="108"
     r="8"
     fill="{{WP_MODE_COLOR}}"
 />
-
 
 <text
     x="67"
@@ -1167,7 +1092,6 @@ body {
 >
     Aktiver WP-Betrieb
 </text>
-
 
 <text
     x="190"
@@ -1180,26 +1104,243 @@ body {
 
 
 
-<!-- AUSSENTEMPERATUR -->
+<!-- ============================================================
+     AUSSENTEMPERATUR
+============================================================ -->
 
 <text
-    x="1515"
-    y="42"
+    x="1545"
+    y="36"
     text-anchor="end"
-    class="schema-label"
+    class="schema-small"
 >
     Aussen
 </text>
 
-
 <text
-    x="1555"
-    y="66"
+    x="1545"
+    y="61"
     text-anchor="end"
     class="schema-value"
 >
     {{OUTSIDE}}
 </text>
+
+
+
+<!-- ============================================================
+     STELLVENTILÜBERSICHT OBEN RECHTS
+============================================================ -->
+
+<g transform="translate(1110 78)">
+
+    <text
+        x="0"
+        y="0"
+        class="schema-title"
+    >
+        Stellventile FBH
+    </text>
+
+
+    <!-- Überschrift -->
+
+    <text
+        x="0"
+        y="29"
+        class="schema-small"
+    >
+        Bereich
+    </text>
+
+    <text
+        x="175"
+        y="29"
+        text-anchor="middle"
+        class="schema-small"
+    >
+        offen
+    </text>
+
+    <text
+        x="305"
+        y="29"
+        text-anchor="end"
+        class="schema-small"
+    >
+        Bedarf
+    </text>
+
+
+    <!-- EG -->
+
+    <text
+        x="0"
+        y="54"
+        class="schema-label"
+    >
+        EG
+    </text>
+
+    <text
+        x="175"
+        y="54"
+        text-anchor="middle"
+        class="schema-value-small"
+    >
+        {{EG_VALVES}}
+    </text>
+
+    <text
+        x="305"
+        y="54"
+        text-anchor="end"
+        class="schema-value-small"
+    >
+        {{EG_DEMAND}}
+    </text>
+
+
+    <!-- OG -->
+
+    <text
+        x="0"
+        y="77"
+        class="schema-label"
+    >
+        OG
+    </text>
+
+    <text
+        x="175"
+        y="77"
+        text-anchor="middle"
+        class="schema-value-small"
+    >
+        {{OG_VALVES}}
+    </text>
+
+    <text
+        x="305"
+        y="77"
+        text-anchor="end"
+        class="schema-value-small"
+    >
+        {{OG_DEMAND}}
+    </text>
+
+
+    <!-- ELW -->
+
+    <text
+        x="0"
+        y="100"
+        class="schema-label"
+    >
+        Einliegerwohnung
+    </text>
+
+    <text
+        x="175"
+        y="100"
+        text-anchor="middle"
+        class="schema-value-small"
+    >
+        {{ELW_VALVES}}
+    </text>
+
+    <text
+        x="305"
+        y="100"
+        text-anchor="end"
+        class="schema-value-small"
+    >
+        {{ELW_DEMAND}}
+    </text>
+
+
+    <line
+        x1="0"
+        y1="113"
+        x2="305"
+        y2="113"
+        stroke="var(--detail-border-soft)"
+        stroke-width="1"
+    />
+
+
+    <!-- Gesamt -->
+
+    <text
+        x="0"
+        y="136"
+        class="schema-label"
+        font-weight="700"
+    >
+        Gesamt
+    </text>
+
+    <text
+        x="175"
+        y="136"
+        text-anchor="middle"
+        class="schema-value-small"
+    >
+        {{TOTAL_VALVES}}
+    </text>
+
+    <text
+        x="305"
+        y="136"
+        text-anchor="end"
+        class="schema-value-small"
+    >
+        {{TOTAL_DEMAND}}
+    </text>
+
+</g>
+
+
+
+<!-- ============================================================
+     FBH OBERER ANSCHLUSS
+============================================================ -->
+
+<text
+    x="1380"
+    y="205"
+    text-anchor="middle"
+    class="schema-small"
+>
+    Rücklauf FBH
+</text>
+
+<text
+    x="1465"
+    y="205"
+    text-anchor="middle"
+    class="schema-small"
+>
+    Vorlauf FBH
+</text>
+
+<polygon
+    points="
+        1380,216
+        1371,231
+        1389,231
+    "
+    fill="var(--blue)"
+/>
+
+<polygon
+    points="
+        1465,216
+        1456,231
+        1474,231
+    "
+    fill="var(--red)"
+/>
 
 
 
@@ -1211,11 +1352,10 @@ body {
     class="component-surface"
     x="60"
     y="295"
-    width="220"
-    height="270"
+    width="250"
+    height="330"
     rx="18"
 />
-
 
 <rect
     class="tank-surface"
@@ -1226,7 +1366,6 @@ body {
     rx="18"
 />
 
-
 <rect
     class="tank-surface"
     x="900"
@@ -1236,28 +1375,27 @@ body {
     rx="18"
 />
 
-
 <rect
     class="component-surface"
-    x="1310"
-    y="245"
-    width="245"
-    height="390"
+    x="1320"
+    y="255"
+    width="225"
+    height="365"
     rx="18"
 />
 
 
 
 <!-- ============================================================
-     ROHRE
+     ROHRFÜHRUNG
 ============================================================ -->
 
 
-<!-- WP -> obere rote Hauptleitung -->
+<!-- WP -> Hauptvorlauf -->
 
 <line
     class="pipe pipe-red"
-    x1="280"
+    x1="310"
     y1="355"
     x2="390"
     y2="355"
@@ -1271,12 +1409,6 @@ body {
     y2="185"
 />
 
-
-<!--
-    WICHTIG:
-    nur eine Ecke rechts.
--->
-
 <polyline
     class="pipe pipe-red"
     points="
@@ -1287,18 +1419,18 @@ body {
 />
 
 
-<!-- Boiler Ladung -->
+<!-- Boilerladung -->
 
 <line
     class="pipe pipe-purple"
-    x1="280"
+    x1="310"
     y1="440"
     x2="500"
     y2="440"
 />
 
 
-<!-- Puffer / Y47 -->
+<!-- Y47 / Puffer -->
 
 <line
     class="pipe pipe-red"
@@ -1371,15 +1503,15 @@ body {
 />
 
 
-<!-- gemeinsamer Rücklauf -->
+<!-- Gemeinsamer Rücklauf -->
 
 <polyline
     class="pipe pipe-blue"
     points="
         820,655
-        300,655
-        300,500
-        280,500
+        330,655
+        330,500
+        310,500
     "
 />
 
@@ -1398,7 +1530,7 @@ body {
 />
 
 
-<!-- FBH Vorlauf unten bis Y1 -->
+<!-- FBH Vorlauf unten -->
 
 <polyline
     class="pipe pipe-red"
@@ -1410,10 +1542,7 @@ body {
 />
 
 
-<!--
-    Blau seitlich auf Y1.
-    Dieser Anschluss fehlte früher.
--->
+<!-- blauer Anschluss Y1 -->
 
 <line
     class="pipe pipe-blue"
@@ -1424,9 +1553,7 @@ body {
 />
 
 
-<!--
-    Roter Vorlauf von Y1 nach Q2.
--->
+<!-- Y1 -> Q2 -->
 
 <line
     class="pipe pipe-red"
@@ -1437,29 +1564,25 @@ body {
 />
 
 
-<!--
-    Roter Vorlauf nach Q2 weiter nach oben.
--->
+<!-- Q2 -> FBH Vorlauf -->
 
 <line
     class="pipe pipe-red"
     x1="1465"
     y1="365"
     x2="1465"
-    y2="220"
+    y2="231"
 />
 
 
-<!--
-    Blauer FBH Rücklauf oben.
--->
+<!-- FBH Rücklauf oben -->
 
 <line
     class="pipe pipe-blue"
     x1="1380"
     y1="410"
     x2="1380"
-    y2="220"
+    y2="231"
 />
 
 
@@ -1477,20 +1600,20 @@ body {
 
 
 <!-- ============================================================
-     WÄRMEPUMPE
+     WP-INHALT
+     ALLES INNERHALB DES WP-KASTENS
 ============================================================ -->
 
 <text
-    x="82"
+    x="85"
     y="325"
     class="schema-title"
 >
     Wärmepumpe
 </text>
 
-
 <text
-    x="82"
+    x="85"
     y="348"
     class="schema-small"
 >
@@ -1498,17 +1621,19 @@ body {
 </text>
 
 
+<!-- Temperaturen -->
+
 <text
-    x="82"
-    y="384"
+    x="85"
+    y="380"
     class="schema-label"
 >
     Vorlauf
 </text>
 
 <text
-    x="250"
-    y="384"
+    x="285"
+    y="380"
     text-anchor="end"
     class="schema-value"
 >
@@ -1517,16 +1642,16 @@ body {
 
 
 <text
-    x="82"
-    y="416"
+    x="85"
+    y="411"
     class="schema-label"
 >
     Rücklauf
 </text>
 
 <text
-    x="250"
-    y="416"
+    x="285"
+    y="411"
     text-anchor="end"
     class="schema-value"
 >
@@ -1534,24 +1659,26 @@ body {
 </text>
 
 
+<!-- Verdichter -->
+
 <circle
-    cx="88"
-    cy="448"
+    cx="91"
+    cy="441"
     r="6"
     fill="{{COMPRESSOR_COLOR}}"
 />
 
 <text
-    x="103"
-    y="453"
+    x="106"
+    y="446"
     class="schema-label"
 >
     Verdichter
 </text>
 
 <text
-    x="250"
-    y="453"
+    x="285"
+    y="446"
     text-anchor="end"
     class="schema-value-small"
 >
@@ -1559,17 +1686,19 @@ body {
 </text>
 
 
+<!-- Modulation -->
+
 <text
-    x="82"
-    y="481"
+    x="85"
+    y="474"
     class="schema-small"
 >
     Modulation
 </text>
 
 <text
-    x="250"
-    y="481"
+    x="285"
+    y="474"
     text-anchor="end"
     class="schema-value-small"
 >
@@ -1577,17 +1706,19 @@ body {
 </text>
 
 
+<!-- Leistung -->
+
 <text
-    x="82"
-    y="506"
+    x="85"
+    y="500"
     class="schema-small"
 >
     Elektrisch
 </text>
 
 <text
-    x="250"
-    y="506"
+    x="285"
+    y="500"
     text-anchor="end"
     class="schema-value-small"
 >
@@ -1596,16 +1727,16 @@ body {
 
 
 <text
-    x="82"
-    y="531"
+    x="85"
+    y="526"
     class="schema-small"
 >
     Wärmeabgabe
 </text>
 
 <text
-    x="250"
-    y="531"
+    x="285"
+    y="526"
     text-anchor="end"
     class="schema-value-small"
 >
@@ -1614,16 +1745,16 @@ body {
 
 
 <text
-    x="82"
-    y="556"
+    x="85"
+    y="552"
     class="schema-small"
 >
     COP
 </text>
 
 <text
-    x="250"
-    y="556"
+    x="285"
+    y="552"
     text-anchor="end"
     class="schema-value-small"
 >
@@ -1632,16 +1763,16 @@ body {
 
 
 <text
-    x="82"
-    y="581"
+    x="85"
+    y="578"
     class="schema-small"
 >
-    Durchfluss
+    WP Durchfluss
 </text>
 
 <text
-    x="250"
-    y="581"
+    x="285"
+    y="578"
     text-anchor="end"
     class="schema-value-small"
 >
@@ -1649,20 +1780,19 @@ body {
 </text>
 
 
-
-<!-- Pumpen sauber unterhalb -->
+<!-- Pumpen kompakt im WP-Kasten -->
 
 <text
-    x="70"
-    y="614"
+    x="85"
+    y="602"
     class="schema-small"
 >
     Kondensatorpumpe
 </text>
 
 <text
-    x="275"
-    y="614"
+    x="285"
+    y="602"
     text-anchor="end"
     class="schema-value-small"
 >
@@ -1671,38 +1801,20 @@ body {
 
 
 <text
-    x="70"
-    y="638"
+    x="85"
+    y="620"
     class="schema-small"
 >
     Quellenpumpe
 </text>
 
 <text
-    x="275"
-    y="638"
+    x="285"
+    y="620"
     text-anchor="end"
     class="schema-value-small"
 >
     {{SOURCE_PUMP}} · {{SOURCE_PUMP_SPEED}}
-</text>
-
-
-<text
-    x="70"
-    y="662"
-    class="schema-small"
->
-    Quellendurchfluss
-</text>
-
-<text
-    x="275"
-    y="662"
-    text-anchor="end"
-    class="schema-value-small"
->
-    {{SOURCE_FLOW}}
 </text>
 
 
@@ -1712,19 +1824,10 @@ body {
 ============================================================ -->
 
 <text
-    x="520"
-    y="300"
-    class="schema-title"
->
-    Brauchwarmwasserspeicher
-</text>
-
-
-<text
     x="620"
-    y="325"
+    y="305"
     text-anchor="middle"
-    class="schema-small"
+    class="schema-title"
 >
     Boiler
 </text>
@@ -1732,7 +1835,7 @@ body {
 
 <text
     x="535"
-    y="355"
+    y="350"
     class="schema-label"
 >
     B3 oben
@@ -1740,7 +1843,7 @@ body {
 
 <text
     x="535"
-    y="379"
+    y="376"
     class="schema-value"
 >
     {{BOILER_TOP}}
@@ -1757,7 +1860,7 @@ body {
 
 <text
     x="535"
-    y="572"
+    y="574"
     class="schema-value"
 >
     {{BOILER_BOTTOM}}
@@ -1765,12 +1868,9 @@ body {
 
 
 
-<!--
-     HEIZSTAB BOILER
-     direkt an Boiler angeordnet
--->
+<!-- BOILER HEIZSTAB -->
 
-<g transform="translate(720 400)">
+<g transform="translate(710 445)">
 
     <rect
         class="svg-heater {{BOILER_HEATER_CLASS}}"
@@ -1790,19 +1890,21 @@ body {
     </text>
 
     <text
-        class="schema-value-small svg-center"
-        x="0"
-        y="36"
+        x="-25"
+        y="0"
+        text-anchor="end"
+        class="schema-small"
     >
-        {{BOILER_HEATER_STATE}}
+        Heizstab
     </text>
 
     <text
-        class="schema-small svg-center"
-        x="0"
-        y="55"
+        x="-25"
+        y="18"
+        text-anchor="end"
+        class="schema-value-small"
     >
-        Heizstab
+        {{BOILER_HEATER_STATE}}
     </text>
 
 </g>
@@ -1814,8 +1916,9 @@ body {
 ============================================================ -->
 
 <text
-    x="920"
-    y="303"
+    x="1020"
+    y="305"
+    text-anchor="middle"
     class="schema-title"
 >
     Pufferspeicher
@@ -1824,7 +1927,7 @@ body {
 
 <text
     x="935"
-    y="345"
+    y="350"
     class="schema-label"
 >
     B4 oben
@@ -1832,7 +1935,7 @@ body {
 
 <text
     x="935"
-    y="369"
+    y="376"
     class="schema-value"
 >
     {{BUFFER_TOP}}
@@ -1849,7 +1952,7 @@ body {
 
 <text
     x="935"
-    y="479"
+    y="481"
     class="schema-value"
 >
     {{BUFFER_MIDDLE}}
@@ -1858,7 +1961,7 @@ body {
 
 <text
     x="935"
-    y="545"
+    y="548"
     class="schema-label"
 >
     B41 unten
@@ -1866,7 +1969,7 @@ body {
 
 <text
     x="935"
-    y="569"
+    y="574"
     class="schema-value"
 >
     {{BUFFER_BOTTOM}}
@@ -1874,12 +1977,9 @@ body {
 
 
 
-<!--
-     HEIZSTAB PUFFER
-     direkt am Puffer angeordnet
--->
+<!-- PUFFER HEIZSTAB -->
 
-<g transform="translate(1120 420)">
+<g transform="translate(1110 445)">
 
     <rect
         class="svg-heater {{BUFFER_HEATER_CLASS}}"
@@ -1899,19 +1999,21 @@ body {
     </text>
 
     <text
-        class="schema-value-small svg-center"
-        x="0"
-        y="36"
+        x="-25"
+        y="0"
+        text-anchor="end"
+        class="schema-small"
     >
-        {{BUFFER_HEATER_STATE}}
+        Heizstab
     </text>
 
     <text
-        class="schema-small svg-center"
-        x="0"
-        y="55"
+        x="-25"
+        y="18"
+        text-anchor="end"
+        class="schema-value-small"
     >
-        Heizstab
+        {{BUFFER_HEATER_STATE}}
     </text>
 
 </g>
@@ -1949,12 +2051,12 @@ body {
 
 
 <!-- ============================================================
-     GRUPPE FBH
+     FBH-GRUPPE
 ============================================================ -->
 
 <text
     x="1432"
-    y="275"
+    y="282"
     text-anchor="middle"
     class="schema-title"
 >
@@ -1962,119 +2064,10 @@ body {
 </text>
 
 
-<text
-    x="1432"
-    y="308"
-    text-anchor="middle"
-    class="schema-value-small"
->
-    Stellventile
-</text>
 
+<!-- Q2 -->
 
-<!-- EG -->
-
-<text
-    x="1335"
-    y="338"
-    class="schema-label"
->
-    EG
-</text>
-
-<text
-    x="1425"
-    y="338"
-    text-anchor="middle"
-    class="schema-value-small"
->
-    {{EG_VALVES}}
-</text>
-
-<text
-    x="1525"
-    y="338"
-    text-anchor="end"
-    class="schema-value-small"
->
-    {{EG_DEMAND}}
-</text>
-
-
-<!-- OG -->
-
-<text
-    x="1335"
-    y="366"
-    class="schema-label"
->
-    OG
-</text>
-
-<text
-    x="1425"
-    y="366"
-    text-anchor="middle"
-    class="schema-value-small"
->
-    {{OG_VALVES}}
-</text>
-
-<text
-    x="1525"
-    y="366"
-    text-anchor="end"
-    class="schema-value-small"
->
-    {{OG_DEMAND}}
-</text>
-
-
-<line
-    x1="1328"
-    y1="385"
-    x2="1530"
-    y2="385"
-    stroke="var(--detail-border-soft)"
-    stroke-width="1"
-/>
-
-
-<!-- Gesamt -->
-
-<text
-    x="1335"
-    y="410"
-    class="schema-label"
->
-    Gesamt
-</text>
-
-<text
-    x="1425"
-    y="410"
-    text-anchor="middle"
-    class="schema-value-small"
->
-    {{TOTAL_VALVES}}
-</text>
-
-<text
-    x="1525"
-    y="410"
-    text-anchor="end"
-    class="schema-value-small"
->
-    {{TOTAL_DEMAND}}
-</text>
-
-
-
-<!-- ============================================================
-     Q2
-============================================================ -->
-
-<g transform="translate(1465 425)">
+<g transform="translate(1465 395)">
 
     <circle
         cx="0"
@@ -2106,9 +2099,7 @@ body {
 
 
 
-<!-- ============================================================
-     Y1
-============================================================ -->
+<!-- Y1 -->
 
 <g transform="translate(1465 490)">
 
@@ -2136,11 +2127,9 @@ body {
 
 
 
-<!-- ============================================================
-     B1
-============================================================ -->
+<!-- B1 -->
 
-<g transform="translate(1465 565)">
+<g transform="translate(1465 560)">
 
     <circle
         cx="0"
@@ -2163,27 +2152,25 @@ body {
 
 
 <text
-    x="1425"
-    y="597"
+    x="1430"
+    y="595"
     text-anchor="end"
     class="schema-small"
 >
     B1
 </text>
 
-
 <text
-    x="1442"
-    y="597"
+    x="1443"
+    y="595"
     class="schema-small"
 >
     Vorlauf FBH
 </text>
 
-
 <text
-    x="1515"
-    y="620"
+    x="1517"
+    y="616"
     text-anchor="end"
     class="schema-value"
 >
@@ -2191,57 +2178,9 @@ body {
 </text>
 
 
-
-<!-- FBH OBEN BESCHRIFTUNG -->
-
-<text
-    x="1380"
-    y="200"
-    text-anchor="middle"
-    class="schema-small"
->
-    Rücklauf FBH
-</text>
-
-
-<text
-    x="1465"
-    y="200"
-    text-anchor="middle"
-    class="schema-small"
->
-    Vorlauf FBH
-</text>
-
-
-<!-- kleine Dreiecke oben -->
-
-<polygon
-    points="
-        1380,211
-        1371,226
-        1389,226
-    "
-    fill="var(--blue)"
-/>
-
-
-<polygon
-    points="
-        1465,211
-        1456,226
-        1474,226
-    "
-    fill="var(--red)"
-/>
-
-
-
 </svg>
 
-
 </div>
-
 
 </div>
 
